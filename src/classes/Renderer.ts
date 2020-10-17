@@ -1,71 +1,72 @@
 import _ from 'lodash';
+import { EventEmitter } from 'events';
 
 import { Func } from '../types';
+import { wait } from '../utils';
 
 export class Renderer {
 
   //#region properties
+  private originalRenderer: Func | RenderFunc;
   private _render: RenderFunc;
-  private _renderer: Promise<any>;
-  private _answer: any;
+  private _rendering: Promise<any>;
   private _options: IRendererOptions = {};
-  private _args: any[] = [];
+  private _arg: any = {};
   //#endregion
 
-  constructor(renderer?: Func | RenderFunc | Renderer) {
-    if (renderer instanceof Renderer) {
-      this._render = renderer._render;
-      this._renderer = renderer._renderer;
-      this._answer = _.cloneDeep(renderer._answer);
-      this._options = _.cloneDeep(renderer._options);
-    } else {
-      this._render = this.wrapRenderer(renderer);
-    }
+  constructor(renderer?: Func | RenderFunc) {
+    this.originalRenderer = renderer;
+    this._render = this.wrapRenderer(renderer);
   }
 
   //#region methods
   private wrapRenderer = (renderer: Func): RenderFunc => {
-    return async (...args: any[]): Promise<any> => {
-      const rendering = renderer(...args);
-      let result = rendering;
+    const promise = this._rendering = new Promise(async resolve => {
+      const rendering = (async () => {
+        // TODO find out why this callback is called during initialization
+        // TODO which causes the Console.clear() from the ConsoleRenderer.render()
+        // TODO To be called AFTER the actual renderers and clear their messages
+        // TODO Should be called BEFORE the renderers
+        await wait(0)
+        return renderer(this.arg());
+      })();
 
-      this.setRenderer(rendering);
+      let result = rendering;
 
       if (typeof rendering?.then === 'function') {
         result = await rendering;
-        this.setRenderer(null);
       }
 
-      return result;
-    }
+      this._rendering = null;
+      resolve(result);
+    });
+
+    return () => promise;
   }
 
-  render(): Promise<any> {
-    return this._render(...this.args());
+  render = (): Promise<any> => {
+    return this._render();
+  }
+
+  reset = () => {
+    this.setRender(this.originalRenderer);
+    return this;
   }
   //#endregion
 
   //#region accessors
   setRender(render: Func | RenderFunc): this {
+    this.originalRenderer = render;
     this._render = this.wrapRenderer(render);
     return this;
   }
 
-  renderer(): Promise<any> {
-    return this._renderer;
+  rendering(): Promise<any> {
+    return this._rendering;
   }
 
-  private setRenderer(renderer: Promise<any>): this {
-    this._renderer = renderer;
-    return this;
-  }
-
-  answer(): any {
-    return this._answer;
-  }
-
-  setAnswer(answer: any): this {
-    this._answer = answer;
+  private setRendering(rendering: Promise<any>): this {
+    this._rendering = rendering;
     return this;
   }
 
@@ -83,12 +84,15 @@ export class Renderer {
     return this;
   }
 
-  args(): any[] {
-    return this._args;
+  arg(): any[] {
+    return this._arg;
   }
 
-  setArgs(...args: any[]): this {
-    this._args = args;
+  setArg(arg: Object): this {
+    this._arg = {
+      ...this._arg,
+      ...arg,
+    };
     return this;
   }
   //#endregion
@@ -100,5 +104,4 @@ interface IRendererOptions {
   saveOutput?: boolean;
   waiter?: boolean;
   noRender?: boolean;
-  noNewLine?: boolean;
 }

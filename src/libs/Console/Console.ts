@@ -29,7 +29,8 @@ export class Console extends ConsoleEffects {
     return this;
   }
 
- writeLine(...messages: unknown[]): this {
+  writeLine(...messages: unknown[]): this {
+    console.trace()
     this.queue.addAndProcess(async () => this.partialWriteLine(...messages));
     return this;
   }
@@ -77,7 +78,7 @@ export class Console extends ConsoleEffects {
   }
 
  clear(): this {
-    this.queue.addAndProcess(async () => console.clear());
+   this.queue.addAndProcess(async () => console.log('clear'));
     return this;
   }
 

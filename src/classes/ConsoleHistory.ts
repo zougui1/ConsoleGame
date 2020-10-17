@@ -13,7 +13,7 @@ export class ConsoleHistory {
 
   //#region methods
   push = (consoleRenderer: ConsoleRenderer): this => {
-    this.history().push(new ConsoleRenderer(consoleRenderer));
+    this.history().push(consoleRenderer);
     this.last();
     return this;
   }
@@ -34,13 +34,12 @@ export class ConsoleHistory {
   }
 
   current = (): ConsoleRenderer => {
-    return this.history()[this.history().length - 1];
+    return this.history()[this.position()];
   }
 
   render = async (): Promise<this> => {
-    const consoleRenderer = this.history()[this.position()];
-    consoleRenderer.removeAnswers();
-    await consoleRenderer.render();
+    const consoleRenderer = this.current();
+    await consoleRenderer.removeAnswers().render();
     return this;
   }
   //#endregion

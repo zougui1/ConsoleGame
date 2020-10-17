@@ -1,25 +1,27 @@
+import { EventEmitter } from 'events';
+
 import { Renderer, RenderFunc } from '.';
 import { Console } from '../libs';
 import { Func } from '../types';
+import { wait } from '../utils';
 
 export class ConsoleRenderer {
 
   //#region properties
   private _rendersData: Renderer[] = [];
-  private pendingPromise: Promise<any>;
+  private pendingRender: Renderer;
   //#endregion
 
-  constructor(consoleRenderer?: ConsoleRenderer) {
-    if (consoleRenderer) {
-      this._rendersData = consoleRenderer._rendersData.slice();
-      this.pendingPromise = consoleRenderer.pendingPromise;
-    }
+  //#region methods
+  private getRenderer = (dirtyRenderer: Func | RenderFunc | Renderer): Renderer => {
+    return dirtyRenderer instanceof Renderer
+      ? dirtyRenderer
+      : new Renderer(dirtyRenderer);
   }
 
-  //#region methods
   add = (dirtyRenderer: Func | RenderFunc | Renderer): this => {
-    const renderer = new Renderer(dirtyRenderer);
-    this.pendingPromise = renderer.renderer();
+    const renderer = this.getRenderer(dirtyRenderer);
+    this.pendingRender = renderer;
     this.rendersData().push(renderer);
     return this;
   }
@@ -40,7 +42,7 @@ export class ConsoleRenderer {
 
   replaceRenderer = (index: number, renderer: Func | RenderFunc | Renderer): this => {
     this.rendersData().pop();
-    this.rendersData()[index] = new Renderer(renderer);
+    this.rendersData()[index] = this.getRenderer(renderer);
     return this;
   }
 
@@ -49,12 +51,12 @@ export class ConsoleRenderer {
     return this;
   }
 
-  await = async (): Promise<any> => {
-    return await this.pendingPromise;
+  await = <T>(): Promise<T> => {
+    return this.pendingRender.rendering();
   }
 
   removeAnswers = (): this => {
-    this.rendersData().forEach(renderData => renderData.setAnswer(undefined));
+    this.rendersData().forEach(renderData => renderData.setArg({ answer: undefined }));
     return this;
   }
 
@@ -69,34 +71,21 @@ export class ConsoleRenderer {
     return this;
   }
 
-  render = async (finalRender: boolean = true): Promise<this> => {
+  render = async (): Promise<this> => {
     Console.clear();
     const rendersData = this.rendersData().filter(r => !r.options().noRender);
 
-    for (let i = 0; i < rendersData.length; i++) {
-      const renderData = rendersData[i];
+    for (const renderData of rendersData) {
       const renderOptions = renderData.options();
-      const nextRenderData = rendersData.slice(i + 1).find(r => !r.options().waiter);
-      renderData.setArgs({ answer: renderData.answer() });
       const answer = await renderData.render();
-
-      if (!renderOptions.noNewLine && nextRenderData?.options().saveOutput && !nextRenderData?.answer()) {
-        await Console.line().await();
-      }
 
       if (renderOptions.waiter) {
         renderData.setOption('noRender', true);
       }
 
       if (renderOptions.saveOutput) {
-        renderData.setAnswer(answer);
+        renderData.setArg({ answer });
       }
-    }
-
-    // if the last renderer is a prompt then we need to re-render it
-    // to display the prompt's render when answered
-    if (finalRender) {
-      await this.render(false);
     }
 
     return this;
@@ -113,16 +102,4 @@ export class ConsoleRenderer {
     return this;
   }
   //#endregion
-}
-
-interface IRendererOptions {
-  saveOutput?: boolean;
-  waiter?: boolean;
-  noRender?: boolean;
-}
-
-interface IRenderData {
-  renderer: Renderer;
-  options: IRendererOptions;
-  answer?: any;
 }
