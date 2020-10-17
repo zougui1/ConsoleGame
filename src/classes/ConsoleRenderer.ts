@@ -17,20 +17,6 @@ export class ConsoleRenderer {
   }
 
   //#region methods
-  private wrapRenderer = (renderer: Func): RenderFunc => {
-    return async (...args: any[]): Promise<any> => {
-      const rendering = this.pendingPromise = renderer(...args);
-      let result = rendering;
-
-      if (typeof rendering?.then === 'function') {
-        result = await rendering;
-        this.pendingPromise = null;
-      }
-
-      return result;
-    }
-  }
-
   add = (dirtyRenderer: Func | RenderFunc | Renderer): this => {
     const renderer = new Renderer(dirtyRenderer);
     this.pendingPromise = renderer.renderer();
