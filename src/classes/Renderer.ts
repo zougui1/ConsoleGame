@@ -21,34 +21,25 @@ export class Renderer {
 
   //#region methods
   private wrapRenderer = (renderer: Func): RenderFunc => {
-    const promise = this._rendering = new Promise(async resolve => {
-      const rendering = (async () => {
-        // TODO find out why this callback is called during initialization
-        // TODO which causes the Console.clear() from the ConsoleRenderer.render()
-        // TODO To be called AFTER the actual renderers and clear their messages
-        // TODO Should be called BEFORE the renderers
-        await wait(0)
-        return renderer(this.arg());
-      })();
+    const promise = async (...args: any[]): Promise<any> => {
+      let result = this._rendering ??= renderer(...args);
 
-      let result = rendering;
-
-      if (typeof rendering?.then === 'function') {
-        result = await rendering;
+      if (typeof result?.then === 'function') {
+        result = await result;
       }
 
-      this._rendering = null;
-      resolve(result);
-    });
+      return result;
+    }
 
-    return () => promise;
+    return promise;
   }
 
   render = (): Promise<any> => {
-    return this._render();
+    return this._render(this.arg());
   }
 
-  reset = () => {
+  clean = (): this => {
+    this._rendering = null;
     this.setRender(this.originalRenderer);
     return this;
   }
@@ -62,12 +53,7 @@ export class Renderer {
   }
 
   rendering(): Promise<any> {
-    return this._rendering;
-  }
-
-  private setRendering(rendering: Promise<any>): this {
-    this._rendering = rendering;
-    return this;
+    return this.render();
   }
 
   options(): IRendererOptions {

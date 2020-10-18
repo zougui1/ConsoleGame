@@ -19,7 +19,30 @@ process.on('uncaughtException', err => {
   process.exit(1);
 });
 
-
 prettyError.start();
 const game = Game.instance();
 game.init();
+/*(async () => {
+  const t = async resolve => {
+    console.log('t')
+    //resolve(null);
+    return 'some val'
+  }
+  await t
+})()*/
+/*
+const t = async (callback) => {
+  setTimeout(() => {
+    console.log('some promise');
+    callback();
+  }, 2000)
+};
+
+const tt = () => new Promise(t);
+
+(async () => {
+  await tt();
+  await t;
+})()
+*/
+//setTimeout(() => { }, 1000);

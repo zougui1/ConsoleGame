@@ -2,11 +2,9 @@ import { wait } from './utils';
 
 export class Queue {
 
+  //#region properties
   private queue: (() => any)[] = [];
-  private _wait = 0;
-  private _timeouts: number[] = [];
-  private isProcessing = false;
-  private pendingPromise: Promise<any>;
+  //#endregion
 
   static async simple(count: number, timeout: number, callback: (index: number) => any): Promise<any> {
     for (let i = 0; i < count; i++) {
@@ -16,7 +14,7 @@ export class Queue {
     await wait(timeout);
   }
 
-  //#region processing
+  //#region methods
   add(func: () => Promise<any>): this {
     this.queue.push(this.processPromisedFunc(func));
     return this;
@@ -29,71 +27,49 @@ export class Queue {
   }
 
   private processPromisedFunc(func: () => Promise<any>): () => any {
-    const promise = this.pendingPromise = new Promise(async resolve => {
-      this.isProcessing = true;
-      await func();
+    const promises = this.queue.slice();
+    // promise of `func` saved here to avoid it being executed more than once
+    let funcPromise: Promise<any> = null;
 
-      setTimeout(() => {
-        resolve(null)
-        this.pendingPromise = null;
-        this.isProcessing = false;
-        this.processQueue();
-      }, this._timeouts.shift() || 0);
-    });
+    const asyncFunc = async (): Promise<any> => {
+      // wait for all previous promises to be finished
+      for (const promise of promises) {
+        await promise();
+      }
 
-    return () => promise;
+      // avoid the function promise to be executed more than once
+      funcPromise ??= func();
+      return await funcPromise;
+    };
+
+    return asyncFunc
   }
+
+  /*private processPromisedFunc(func: () => Promise<any>): () => any {
+    let currentPromise: Promise<any> = null;
+
+    const asyncFunc = async (): Promise<any> => {
+      this.isProcessing = true;
+
+      currentPromise ??= func();
+      await currentPromise;
+      // avoid the function to be called more than once
+      this.isProcessing = false;
+      //this.processQueue();
+    };
+
+    return asyncFunc
+  }*/
 
   async await(): Promise<any> {
-    return await this.pendingPromise;
+    return await this.queue[this.queue.length - 1]();
   }
 
-  processQueue(): void {
-    if (this.isProcessing) {
-      return;
+  async processQueue() {
+    for (const func of this.queue) {
+      await func();
+      this.queue.shift();
     }
-
-    const func = this.queue.shift();
-
-    if (func) {
-      func();
-    }
-  }
-
-  pushTimeout(timeout: number): this {
-    this._timeouts.push(timeout);
-    return this;
-  }
-  //#endregion
-
-  //#region contextual accessors
-  timeout(): number {
-    return this._timeouts[0];
-  }
-
-  setTimeout(timeout: number): this {
-    this._timeouts = [timeout];
-    return this;
-  }
-  //#endregion
-
-  //#region accessors
-  timeouts(): number[] {
-    return this._timeouts;
-  }
-
-  setTimeouts(timeouts: number[]): this {
-    this._timeouts = timeouts;
-    return this;
-  }
-
-  wait(): number {
-    return this._wait;
-  }
-
-  setWait(wait: number): this {
-    this._timeouts.push(wait);
-    return this;
   }
   //#endregion
 }

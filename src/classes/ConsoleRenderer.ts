@@ -76,6 +76,7 @@ export class ConsoleRenderer {
     const rendersData = this.rendersData().filter(r => !r.options().noRender);
 
     for (const renderData of rendersData) {
+      renderData.clean();
       const renderOptions = renderData.options();
       const answer = await renderData.render();
 
@@ -84,6 +85,7 @@ export class ConsoleRenderer {
       }
 
       if (renderOptions.saveOutput) {
+        //Console.red.writeLine('saveOutput', answer)
         renderData.setArg({ answer });
       }
     }

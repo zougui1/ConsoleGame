@@ -1,11 +1,12 @@
 import { ConsoleEffects } from './ConsoleEffects';
 import { Queue } from './Queue';
+import { wait } from './utils';
 
 const defaultProgressionTimeout = 40;
 
 export class Console extends ConsoleEffects {
 
-  private queue = new Queue();
+  protected queue = new Queue();
   private _progressionTimeout = defaultProgressionTimeout;
 
   private partialWrite(...messages: unknown[]): this {
@@ -19,23 +20,21 @@ export class Console extends ConsoleEffects {
     console.log(message);
   }
 
-  async await(): Promise<any> {
-    await this.queue.await();
-    return;
+  async await<T>(): Promise<T> {
+    return await this.queue.await();
   }
 
- write(...messages: unknown[]): this {
+  write(...messages: unknown[]): this {
     this.queue.addAndProcess(async () => this.partialWrite(...messages));
     return this;
   }
 
   writeLine(...messages: unknown[]): this {
-    console.trace()
     this.queue.addAndProcess(async () => this.partialWriteLine(...messages));
     return this;
   }
 
- writeProgressively(...messages: unknown[]): this {
+  writeProgressively(...messages: unknown[]): this {
     const message = this.format(...messages);
 
     this.saveState;
@@ -48,19 +47,23 @@ export class Console extends ConsoleEffects {
     return this;
   }
 
- writeLineProgressively(...messages: unknown[]): this {
+  writeLineProgressively(...messages: unknown[]): this {
     this.writeProgressively(...messages, '\n');
     return this;
   }
 
- wait(timeout: number): this {
-    this.queue.addAndProcess(async () => this.queue.setWait(timeout));
+  wait(timeout: number): this {
+    this.queue.addAndProcess(() => wait(timeout));
     return this;
   }
 
- line(count: number = 1): this {
-    while (count--) {
-      this.writeLine();
+  line(count: number = 1): this {
+    if (count) {
+      this.queue.addAndProcess(async () => {
+        while (count--) {
+          this.partialWriteLine();
+        }
+      });
     }
 
     return this;
@@ -77,22 +80,22 @@ export class Console extends ConsoleEffects {
     return this;
   }
 
- clear(): this {
-   this.queue.addAndProcess(async () => console.log('clear'));
+  clear(): this {
+   this.queue.addAndProcess(async () => console.clear());
     return this;
   }
 
   //#region accessors
- progressionTimeout(): number {
+  progressionTimeout(): number {
     return this._progressionTimeout;
   }
 
- setProgressionTimeout(timeout: number): this {
+  setProgressionTimeout(timeout: number): this {
     this._progressionTimeout = timeout;
     return this;
   }
 
- divider(str: string): this {
+  divider(str: string): this {
     // minus one so that it can print the newline character
     this.writeLine(str.repeat(this.width() - 1));
     return this;
@@ -100,11 +103,11 @@ export class Console extends ConsoleEffects {
   //#endregion
 
   //#region console accessors
- width(): number {
+  width(): number {
     return process.stdout.columns;
   }
 
- height(): number {
+  height(): number {
     return process.stdout.rows;
   }
   //#endregion

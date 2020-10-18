@@ -19,7 +19,7 @@ import {
 
 export class SuperConsole extends Console {
 
-  async select(message: string, choices: IChoice[], options: IArrayPromptOptions = {}): Promise<IChoice> {
+  select(message: string, choices: IChoice[], options: IArrayPromptOptions = {}): this {
     options.limit ??= 7;
     const footerColor = '#999';
 
@@ -35,45 +35,50 @@ export class SuperConsole extends Console {
         ? dirtyAnswer.message
         : undefined;
 
-    choices.forEach(c => {
-      c.name ??= c.message;
-      if (c.effects) {
-        c.message = c.effects.format(c.message);
-      }
-    });
-
-    if (!answer) {
-      // @ts-ignore
-      const prompt = new Enquirer.Select({
-        ...options,
-        name: message,
-        message: this.hex(messageColor).format(message),
-        choices: choices,
+    this.queue.addAndProcess(async () => {
+      choices.forEach(c => {
+        c.name ??= c.message;
+        if (c.effects) {
+          c.message = c.effects.format(c.message);
+        }
       });
 
-      answer = await prompt.run();
-    } else {
-      this
-        .green.write(symbols.check)
-        .hex(messageColor).write('', message, '')
-        .write(symbols.separator.submitted, '')
-        .cyan.write(answer)
-        .line();
-    }
+      if (!answer) {
+        // @ts-ignore
+        const prompt = new Enquirer.Select({
+          ...options,
+          name: message,
+          message: this.hex(messageColor).format(message),
+          choices: choices,
+        });
 
-    const choice = choices.find(c => c.message === answer);
-
-    if (choice.process && choice.action) {
-      const result = choice.action(...choice.args || []);
-
-      if (choice.await) {
-        return await result;
+        answer = await prompt.run();
+      } else {
+        //console.log('answer', answer)
+        await this
+          .green.write(symbols.check)
+          .hex(messageColor).write('', message, '')
+          .white.write(symbols.separator.submitted, '')
+          .cyan.write(answer)
+          /*.line()*/.await();
       }
 
-      return result;
-    }
+      const choice = choices.find(c => c.message === answer);
 
-    return choice;
+      if (choice.process && choice.action) {
+        const result = choice.action(...choice.args || []);
+
+        if (choice.await) {
+          return await result;
+        }
+
+        return result;
+      }
+
+      return choice;
+    });
+
+    return this;
   }
 
   async numberPrompt(message: string, options: INumberPromptOptions = {}): Promise<number> {

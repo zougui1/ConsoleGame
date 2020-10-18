@@ -32,12 +32,12 @@ export class Game {
   //#endregion
 
   //#region methods
-  init = () => {
+  init = async () => {
     const consolerenderer = new ConsoleRenderer();
-    consolerenderer.add(new Renderer(() => Console.writeLine('Welcome in the Console Game!')));
+    //consolerenderer.add(new Renderer(() => Console.writeLine('Welcome in the Console Game!')));
     this.consoleHistory().push(consolerenderer).render();
 
-    //this.mainMenu();
+    this.mainMenu();
   }
 
   mainMenu = async () => {
@@ -46,24 +46,46 @@ export class Game {
       .current()
       .addToRender(
         new Renderer(({ answer }) => {
-          return Console.line().select('What do you want to do?', [
-            {
-              message: 'Start a new game',
-              action: this.newGame,
-            },
-            {
-              message: 'Load a game',
-              action: this.loader,
-            },
-          ], { answer });
+          //console.log('select render')
+          return Console
+            .line()
+            .select('What do you want to do?', [
+              {
+                message: 'Start a new game',
+                action: this.newGame,
+              },
+              {
+                message: 'Load a game',
+                action: this.loader,
+              },
+            ], { answer })
+            .await();
         }).setOption('saveOutput', true)
       )
       .await<IChoice>();
 
-    this.consoleHistory().render()
-    //console.log('result')
-    //setTimeout(() => console.log('result'), 1000)
-    //await result.action();
+    /*const result = await Console
+      .line()
+      .wait(1000)
+      .select('What do you want to do?', [
+        {
+          message: 'Start a new game',
+          action: this.newGame,
+        },
+        {
+          message: 'Load a game',
+          action: this.loader,
+        },
+      ])
+      .await<IChoice>();*/
+    //const t = await result(() => {})
+
+    //Console.writeLineProgressively('some text');
+
+    //this.consoleHistory().render()
+    //console.log('result', result)
+    //setTimeout(() => console.log('result', result), 1000)
+    await result.action();
   }
 
   loader = () => {
@@ -75,27 +97,30 @@ export class Game {
   }
 
   private chooseClass = async () => {
-    const result = await this
+    const resut = await this
       .consoleHistory()
       .current()
       .addToRender(
         new Renderer(({ answer }) => {
-          return Console.line().select('What do you want to do?', [
-            {
-              message: 'Start a new game',
-              action: this.newGame,
-            },
-            {
-              message: 'Load a game',
-              action: this.loader,
-            },
-          ], { answer });
+          return Console
+            .line()
+            .select('What do you want to do?', [
+              {
+                message: 'Start a new game',
+                action: this.newGame,
+              },
+              {
+                message: 'Load a game',
+                action: this.loader,
+              },
+            ], { answer })
+            .await();
         }).setOption('saveOutput', true)
       )
       .await<IChoice>();
 
-    await result.action();
-    /*const choices: IChoice[] = Object.values(BeginningClasses).map(className => ({
+    //await result.action();
+    const choices: IChoice[] = Object.values(BeginningClasses).map(className => ({
       message: _.upperFirst(className),
       action: this.chooseName,
     }));
@@ -105,13 +130,13 @@ export class Game {
       .current()
       .addToRender(
         new Renderer(({ answer }) => {
-          return Console.line().select('What is your class?', choices, { answer });
+          return Console.line().select('What is your class?', choices, { answer }).await();
         }).setOption('saveOutput', true)
       )
       .await<IChoice>();
 
     const character = new Character().setClassName(BeginningClasses[result.message.toLowerCase()]);
-    await result.action(character);*/
+    await result.action(character);
     /*const answer = await Console.line().select('What is your class?', choices);
     const character = new Character().setClassName(BeginningClasses[answer.message.toLowerCase()]);
     await answer.action(character);*/
@@ -161,15 +186,6 @@ export class Game {
 
   private setUser(user: User): this {
     this._user = user;
-    return this;
-  }
-
-  consoleRenderer(): ConsoleRenderer {
-    return this._consoleRenderer;
-  }
-
-  private setConsoleRenderer(consoleRenderer: ConsoleRenderer): this {
-    this._consoleRenderer = consoleRenderer;
     return this;
   }
 
