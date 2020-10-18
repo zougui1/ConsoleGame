@@ -45,22 +45,6 @@ export class Queue {
     return asyncFunc
   }
 
-  /*private processPromisedFunc(func: () => Promise<any>): () => any {
-    let currentPromise: Promise<any> = null;
-
-    const asyncFunc = async (): Promise<any> => {
-      this.isProcessing = true;
-
-      currentPromise ??= func();
-      await currentPromise;
-      // avoid the function to be called more than once
-      this.isProcessing = false;
-      //this.processQueue();
-    };
-
-    return asyncFunc
-  }*/
-
   async await(): Promise<any> {
     return await this.queue[this.queue.length - 1]();
   }
