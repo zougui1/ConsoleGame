@@ -88,6 +88,6 @@ export type RenderFunc = (...args: any[]) => Promise<any>;
 
 interface IRendererOptions {
   saveOutput?: boolean;
-  waiter?: boolean;
+  executeOnce?: boolean;
   noRender?: boolean;
 }

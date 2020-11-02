@@ -17,6 +17,8 @@ import {
   SortPromptOptions,
 } from './types';
 
+const messageColor = '#bbb';
+
 export class SuperConsole extends Console {
 
   select(message: string, choices: IChoice[], options: IArrayPromptOptions = {}): this {
@@ -28,7 +30,6 @@ export class SuperConsole extends Console {
     }
 
     const { answer: dirtyAnswer } = options;
-    const messageColor = '#bbb';
     let answer: string | undefined = typeof dirtyAnswer === 'string'
       ? dirtyAnswer
       : typeof dirtyAnswer === 'object' && dirtyAnswer
@@ -54,13 +55,7 @@ export class SuperConsole extends Console {
 
         answer = await prompt.run();
       } else {
-        //console.log('answer', answer)
-        await this
-          .green.write(symbols.check)
-          .hex(messageColor).write('', message, '')
-          .white.write(symbols.separator.submitted, '')
-          .cyan.write(answer)
-          /*.line()*/.await();
+        await this.printAnswer(message, answer);
       }
 
       const choice = choices.find(c => c.message === answer);
@@ -86,22 +81,43 @@ export class SuperConsole extends Console {
     const prompt = new Enquirer.NumberPrompt({
       ...options,
       name: message,
-      message: this.hex('#bbb').format(message),
+      message: this.hex(messageColor).format(message),
     });
 
     return await prompt.run();
   }
 
-  async prompt(message: string, options: IStringPromptOptions = {}): Promise<string> {
-    // @ts-ignore
-    const prompt = new Enquirer.Input({
-      ...options,
-      name: message,
-      message: this.hex('#bbb').format(message),
+  prompt(message: string, options: IStringPromptOptions = {}): this {
+    const { answer: dirtyAnswer } = options;
+    let answer: string | undefined = typeof dirtyAnswer === 'string'
+      ? dirtyAnswer
+      : undefined;
+
+
+    this.queue.addAndProcess(async () => {
+      if (!answer) {
+        // @ts-ignore
+        const prompt = new Enquirer.Input({
+          ...options,
+          name: message,
+          message: this.hex(messageColor).format(message),
+        });
+
+        answer = await prompt.run();
+      } else {
+        await this.printAnswer(message, answer);
+      }
     });
 
-    const input = await prompt.run();
+    return this;
+  }
 
-    return input;
+  private async printAnswer(message, answer): Promise<any> {
+    return await this
+      .green.write(symbols.check)
+      .hex(messageColor).write('', message, '')
+      .white.write(symbols.separator.submitted, '')
+      .cyan.write(answer)
+      /*.line()*/.await();
   }
 }

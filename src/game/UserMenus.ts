@@ -2,6 +2,7 @@ import { User, Building } from '.';
 import { NotImplementedError } from '../errors';
 import { Console } from '../libs';
 import { Npc } from '../entities';
+import { IChoice } from '../libs/Console/types';
 
 export class UserMenus {
 
@@ -21,7 +22,7 @@ export class UserMenus {
         message: 'Leave',
         action: user.leaveLocation,
       },
-    ]);
+    ]).await<IChoice>();
 
     choice.action();
   }
@@ -37,7 +38,7 @@ export class UserMenus {
         message: 'Leave',
         action: user.leaveBuilding,
       },
-    ]);
+    ]).await<IChoice>();
 
     choice.action();
   }
@@ -54,7 +55,7 @@ export class UserMenus {
         process: true,
         await: true,
       },
-    ]);
+    ]).await<IChoice>();
 
     choice.action();
   }
@@ -65,7 +66,7 @@ export class UserMenus {
       action: citizen.talk,
       process: true,
       await: true,
-    })));
+    }))).await<IChoice>();
 
     choice.action();
   }

@@ -42,6 +42,16 @@ export class ConsoleHistory {
     await consoleRenderer.removeAnswers().render();
     return this;
   }
+
+  addToRender = (fn: any): this => {
+    this.current().addToRender(fn);
+    //this.render();
+    return this;
+  }
+
+  await = <T>(): Promise<T> => {
+    return this.current().await();
+  }
   //#endregion
 
   //#region accessors

@@ -1,15 +1,13 @@
-import { EventEmitter } from 'events';
-
 import { Renderer, RenderFunc } from '.';
 import { Console } from '../libs';
 import { Func } from '../types';
-import { wait } from '../utils';
 
 export class ConsoleRenderer {
 
   //#region properties
   private _rendersData: Renderer[] = [];
-  private pendingRender: Renderer;
+  private pendingRenderer: Renderer;
+  private pendingRender: Promise<any>;
   //#endregion
 
   //#region methods
@@ -21,14 +19,14 @@ export class ConsoleRenderer {
 
   add = (dirtyRenderer: Func | RenderFunc | Renderer): this => {
     const renderer = this.getRenderer(dirtyRenderer);
-    this.pendingRender = renderer;
+    this.pendingRenderer = renderer;
     this.rendersData().push(renderer);
     return this;
   }
 
   addWait = (wait: number): this => {
     const renderer = new Renderer(() => Console.wait(wait).await())
-      .setOption('waiter', true);
+      .setOption('executeOnce', true);
 
     this.add(renderer);
     return this;
@@ -36,7 +34,7 @@ export class ConsoleRenderer {
 
   addToRender = (renderer: Func | RenderFunc | Renderer): this => {
     this.add(renderer);
-    this.render();
+    this.pendingRender = this.render();
     return this;
   }
 
@@ -51,8 +49,9 @@ export class ConsoleRenderer {
     return this;
   }
 
-  await = <T>(): Promise<T> => {
-    return this.pendingRender.rendering();
+  await = async <T>(): Promise<T> => {
+    await this.pendingRender;
+    return await this.pendingRenderer.rendering();
   }
 
   removeAnswers = (): this => {
@@ -80,7 +79,7 @@ export class ConsoleRenderer {
       const renderOptions = renderData.options();
       const answer = await renderData.render();
 
-      if (renderOptions.waiter) {
+      if (renderOptions.executeOnce) {
         renderData.setOption('noRender', true);
       }
 

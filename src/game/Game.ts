@@ -34,8 +34,8 @@ export class Game {
   //#region methods
   init = async () => {
     const consolerenderer = new ConsoleRenderer();
-    //consolerenderer.add(new Renderer(() => Console.writeLine('Welcome in the Console Game!')));
-    this.consoleHistory().push(consolerenderer).render();
+    consolerenderer.add(new Renderer(() => Console.writeLine('Welcome in the Console Game!')));
+    await this.consoleHistory().push(consolerenderer).render();
 
     this.mainMenu();
   }
@@ -43,10 +43,8 @@ export class Game {
   mainMenu = async () => {
     const result = await this
       .consoleHistory()
-      .current()
       .addToRender(
         new Renderer(({ answer }) => {
-          //console.log('select render')
           return Console
             .line()
             .select('What do you want to do?', [
@@ -64,27 +62,6 @@ export class Game {
       )
       .await<IChoice>();
 
-    /*const result = await Console
-      .line()
-      .wait(1000)
-      .select('What do you want to do?', [
-        {
-          message: 'Start a new game',
-          action: this.newGame,
-        },
-        {
-          message: 'Load a game',
-          action: this.loader,
-        },
-      ])
-      .await<IChoice>();*/
-    //const t = await result(() => {})
-
-    //Console.writeLineProgressively('some text');
-
-    //this.consoleHistory().render()
-    //console.log('result', result)
-    //setTimeout(() => console.log('result', result), 1000)
     await result.action();
   }
 
@@ -97,29 +74,6 @@ export class Game {
   }
 
   private chooseClass = async () => {
-    const resut = await this
-      .consoleHistory()
-      .current()
-      .addToRender(
-        new Renderer(({ answer }) => {
-          return Console
-            .line()
-            .select('What do you want to do?', [
-              {
-                message: 'Start a new game',
-                action: this.newGame,
-              },
-              {
-                message: 'Load a game',
-                action: this.loader,
-              },
-            ], { answer })
-            .await();
-        }).setOption('saveOutput', true)
-      )
-      .await<IChoice>();
-
-    //await result.action();
     const choices: IChoice[] = Object.values(BeginningClasses).map(className => ({
       message: _.upperFirst(className),
       action: this.chooseName,
@@ -127,7 +81,6 @@ export class Game {
 
     const result = await this
       .consoleHistory()
-      .current()
       .addToRender(
         new Renderer(({ answer }) => {
           return Console.line().select('What is your class?', choices, { answer }).await();
@@ -144,9 +97,17 @@ export class Game {
 
   private chooseName = async (character: Character) => {
 
-    const name = await Console.line().prompt('What is your name?', {
-      validate: value => value.trim(),
-    });
+    const name = await this
+      .consoleHistory()
+      .addToRender(
+        new Renderer(({ answer }) => {
+          return Console.line().prompt('What is your name?', {
+            validate: value => !!value.trim(),
+            answer,
+          });
+        })
+      )
+      .await<string>();
 
     character.setName(name).setStats(new Stats().increaseHealth(20));
     this.createGame(character);
