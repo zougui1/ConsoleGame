@@ -1,7 +1,7 @@
 import { Directions } from '../data';
-import { NotImplementedError } from '../errors';
+import { NotImplementedError, UnexpectedError } from '../errors';
 import { Console } from '../libs';
-import { UnexpectedError } from './../errors/UnexpectedError';
+import { LiteralObject } from '../types';
 
 export class Coords {
 
@@ -15,25 +15,15 @@ export class Coords {
     this._y = y;
   }
 
-  //#region methods
-  async numberMove(direction: Directions) {
-    const moves = await Console
-      .line()
-      .numberPrompt('How many times do you want to move? (1-20)', { min: 1, max: 20 });
-    this.moves(moves, direction);
+  //#region static methods
+  static fromJson(data: LiteralObject): Coords {
+    const coords = new Coords().setX(data.x).setY(data.y);
+    return coords;
   }
+  //#endregion
 
-  moves(moves: number, direction: Directions) {
-    while (moves--) {
-      if (this.move(direction)) {
-        return;
-      }
-    }
-
-    Console.writeLine('Nothing happened.');
-  }
-
-  move(direction: Directions): boolean {
+  //#region functions
+  move(direction: Directions) {
     switch (direction) {
       case Directions.left:
         this.moveLeft();
@@ -51,24 +41,22 @@ export class Coords {
       default:
         throw new UnexpectedError(`Unknown direction "${direction}"`);
     }
-
-    throw new NotImplementedError();
   }
 
   moveLeft() {
-    this.setY(this.x() - 1);
+    this.setX(this.x() - 1);
   }
 
   moveUp() {
-    this.setY(this.y() - 1);
+    this.setY(this.y() + 1);
   }
 
   moveRight() {
-    this.setY(this.x() + 1);
+    this.setX(this.x() + 1);
   }
 
   moveDown() {
-    this.setY(this.y() + 1);
+    this.setY(this.y() - 1);
   }
   //#endregion
 

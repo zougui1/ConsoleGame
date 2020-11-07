@@ -1,24 +1,51 @@
 import { Console } from '../libs';
-import { NotImplementedError } from '../errors';
+import { Game } from './Game';
 import { Coords } from '../misc';
 import { Npc } from '../entities';
+import { LocationCategory } from '../data';
+import { LiteralObject } from '../types';
+import { Building } from './Building';
+import Table from 'tty-table'
 
 export class Location {
 
   //#region properties
   private _name: string = '';
   private _coords: Coords;
-  private _buildings;
-  private _citizens: Npc[] = [];
-  // TODO enum
-  private _type: string = '';
+  private _buildings: Building[] = [];
+  private _npcs: Npc[] = [];
+  private _category: LocationCategory;
   //#endregion
 
-  static fromJson(data: Object): Location {
-    const location = Object.assign(new Location, data);
-    throw new NotImplementedError();
+  //#region static methods
+  static fromJson(data: LiteralObject): Location {
+    if (!data) {
+      return;
+    }
+
+    const location = new Location()
+      .setName(data.name)
+      .setCoords(Coords.fromJson(data.coords))
+      .setBuildings(data.buildings?.map(building => Building.fromJson(building)))
+      .setNpcs(data.npcs?.map(npc => Npc.fromJson(npc)))
+      .setCategory(data.category);
     return location;
   }
+  //#endregion
+
+  //#region functions
+  enter = async (): Promise<void> => {
+    Game
+      .get()
+      .consoleHistory()
+      .addToRender(() => Console
+        .cyanBright.write('Welcome in ')
+        .cyan.write(this.name())
+        .cyanBright.write('!')
+        .line(2)
+      );
+  }
+  //#endregion
 
   //#region accessors
   name(): string {
@@ -44,25 +71,34 @@ export class Location {
   }
 
   setBuildings(buildings: any): this {
-    this._buildings = buildings;
+    this._buildings = buildings ?? this._buildings;
     return this;
   }
 
-  citizens(): Npc[] {
-    return this._citizens;
+  npcs(): Npc[] {
+    return this._npcs;
   }
 
-  setCitizens(citizens: Npc[]): this {
-    this._citizens = citizens;
+  setNpcs(npcs: Npc[]): this {
+    this._npcs = npcs ?? this._npcs;
     return this;
   }
 
-  type(): string {
-    return this._type;
+  category(): LocationCategory {
+    return this._category;
   }
 
-  setType(type: string): this {
-    this._type = type;
+  setCategory(category: LocationCategory): this {
+    switch (category) {
+      case LocationCategory.town:
+      case LocationCategory.city:
+      case LocationCategory.kingdom:
+        this._category = category;
+        break;
+
+      default:
+        throw new Error(`Invalid location category. Got "${category}"`);
+    }
     return this;
   }
   //#endregion

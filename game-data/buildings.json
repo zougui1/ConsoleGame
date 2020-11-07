@@ -1,0 +1,13 @@
+{
+  "data": [
+    {
+      "id": 0,
+      "category": "weaponShop",
+      "name": "Weapon shop",
+      "isLocked": false,
+      "metadata": {
+        "npcs": []
+      }
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "data": [
+    {
+      "id": 0,
+      "category": "monster",
+      "type": "slime",
+      "name": "Slime",
+      "stats": {
+        "maxHealth": 13,
+        "health": 13,
+        "maxMana": 0,
+        "mana": 0,
+        "strength": 2,
+        "resistance": 6,
+        "magicalMight": 0,
+        "magicalMending": 0,
+        "agility": 2,
+        "deftness": 1,
+        "experience": 3
+      },
+      "lootTable": [
+        {
+          "percent": 10,
+          "id": 0
+        },
+        {
+          "percent": 50,
+          "id": 0
+        },
+        {
+          "percent": 100,
+          "id": 0
+        }
+      ],
+      "metadata": {
+        "weapon": {
+          "id": 0,
+          "file": "items.json"
+        }
+      }
+    },
+    {
+      "id": 1,
+      "category": "citizen",
+      "type": "merchant",
+      "name": "Brutus",
+      "text": "Lorem ipsum dolor sit amet, consectetur adipisicing elit.\nVel quasi aliquid quae sint sapiente? Eum quaerat itaque eius ut maiores dolores! Enim, eaque. Vero quas porro repellat excepturi et nemo.",
+      "lootTable": [
+        {
+          "percent": 10,
+          "id": 0
+        },
+        {
+          "percent": 50,
+          "id": 0
+        },
+        {
+          "percent": 100,
+          "id": 0
+        }
+      ]
+    }
+  ]
+}

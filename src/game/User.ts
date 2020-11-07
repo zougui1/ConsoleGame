@@ -4,33 +4,54 @@ import { NotImplementedError } from '../errors';
 import { Character } from '../entities';
 import { Coords } from '../misc';
 import { UserMenus } from './UserMenus';
+import { Game } from './Game';
+import { Directions } from '../data';
+import { LiteralObject } from '../types';
+import { GameData } from '../gameData';
+import { wildernessHeader } from './headers';
 
 export class User {
 
   //#region properties
   private _characters: Character[] = [];
   private _coords: Coords = new Coords(0, 0);
-  private _enemies = [];
+  private _name: string = '';
+  private _battle;
   private _bag;
   private _gold: number = 0;
   private _location: Location;
   private _building: Building;
   //#endregion
 
-  static fromJson(data: Object): User {
-    const user = Object.assign(new User, data);
-    throw new NotImplementedError();
+  //#region static methods
+  static fromJson(data: LiteralObject): User {
+    const user = new User()
+      .setBuilding(Building.fromJson(data.building))
+      .setCharacters(data.characters?.map(c => Character.fromJson(c)))
+      .setLocation(Location.fromJson(data.location))
+      .setCoords(Coords.fromJson(data.coords))
+      .setName(data.name)
+      .setBag(data.bag)
+      .setBattle(data.battle)
+      .setGold(data.gold);
     return user;
   }
+  //#endregion
 
-  //#region methods
-  async chooseAction() {
+  //#region functions
+  chooseAction = async () => {
     if (this.isTeamAlive()) {
-      if (this.location()) {
-        UserMenus.locationMenu(this);
-      } else if (this.building()) {
+      if (this.building()) {
         UserMenus.buildingMenu(this);
+      } else if (this.location()) {
+        UserMenus.locationMenu(this);
       } else {
+        Game
+          .get()
+          .consoleHistory()
+          .addHeader(() => {
+            return wildernessHeader(this.coords()).await();
+          });
         UserMenus.wildernessMenu(this);
       }
     } else {
@@ -38,8 +59,44 @@ export class User {
     }
   }
 
-  async chooseDirection() {
-    throw new NotImplementedError();
+  chooseDirection = async () => {
+    const game = Game.get();
+
+    game
+      .consoleHistory()
+      .newRender()
+      .addHeader(() => {
+        return wildernessHeader(this.coords()).await();
+      })
+      .addToRender(() => Console.writeLine('Press on an arrow to move and on esc to stop moving'));
+
+    game.consoleHistory().onCurrent('keypress', (str, key) => {
+      switch (key.name) {
+        case 'up':
+        case 'left':
+        case 'down':
+        case 'right':
+          this.move(Directions[key.name]);
+          break;
+      }
+    });
+  }
+
+  move = async (direction: Directions) => {
+    this.coords().move(direction);
+    const x = this.coords().x();
+    const y = this.coords().y();
+    await Game.get().consoleHistory().render();
+
+    const potentialLocation = await GameData.get().findLocationByCoords(x, y);
+
+    if (potentialLocation) {
+      Game.get().consoleHistory().newRender();
+
+      this.setLocation(potentialLocation);
+      this.location().enter();
+      this.chooseAction();
+    }
   }
 
   rest() {
@@ -50,9 +107,9 @@ export class User {
     throw new NotImplementedError();
   }
 
-  battle() {
+  /*battle() {
     throw new NotImplementedError();
-  }
+  }*/
 
   win() {
     throw new NotImplementedError();
@@ -107,13 +164,16 @@ export class User {
   }
 
   leaveLocation = () => {
-    this.setLocation(null);
+    this.setLocation(undefined);
+    Game.get().consoleHistory().newRender();
     this.coords().moveDown();
+    this.chooseAction();
   }
 
   leaveBuilding = () => {
-    this.setBuilding(null);
-    this.coords().moveDown();
+    this.setBuilding(undefined);
+    Game.get().consoleHistory().newRender();
+    this.chooseAction();
   }
   //#endregion
 
@@ -129,12 +189,53 @@ export class User {
     return this._coords;
   }
 
+  setCoords(coords: Coords): this {
+    this._coords = coords ?? this._coords;
+    return this;
+  }
+
+  name(): string {
+    return this._name;
+  }
+
+  setName(name: string): this {
+    this._name = name;
+    return this;
+  }
+
+  battle(): any /*Battle*/ {
+    return this._battle;
+  }
+
+  setBattle(battle: any /*Battle*/): this {
+    this._battle = battle;
+    return this;
+  }
+
+  bag(): any /*Bag*/ {
+    return this._bag;
+  }
+
+  setBag(bag: any /*Bag*/): this {
+    this._bag = bag ?? this._bag;
+    return this;
+  }
+
+  gold(): number {
+    return this._gold;
+  }
+
+  setGold(gold: number): this {
+    this._gold = gold ?? this._gold;
+    return this;
+  }
+
   characters(): Character[] {
     return this._characters;
   }
 
   setCharacters(characters: Character[]): this {
-    this._characters = characters;
+    this._characters = characters ?? this._characters;
     return this;
   }
 

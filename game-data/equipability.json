@@ -1,0 +1,270 @@
+{
+  "equipable": {
+    "warrior": {
+      "armor": {
+        "arm": [
+          "arm",
+          "hand"
+        ],
+        "feet": [
+          "boots"
+        ],
+        "head": [
+          "helmet"
+        ],
+        "leg": [
+          "heavyLegware"
+        ],
+        "torso": [
+          "chestplate"
+        ]
+      },
+      "handed": {
+        "weapons": [
+          "sword",
+          "greatsword"
+        ],
+        "shields": [
+          "lightShield",
+          "heavyShield",
+          "greatShield"
+        ]
+      }
+    },
+    "mage": {
+      "armor": {
+        "arm": [
+          "hand"
+        ],
+        "feet": [
+          "shoes"
+        ],
+        "head": [
+          "hat"
+        ],
+        "leg": [
+          "costumeLegware"
+        ],
+        "torso": [
+          "robe"
+        ]
+      },
+      "handed": {
+        "weapons": [
+          "heavyStaff"
+        ],
+        "shields": [
+          "lightShield"
+        ]
+      }
+    },
+    "priest": {
+      "armor": {
+        "arm": [
+          "hand"
+        ],
+        "feet": [
+          "shoes"
+        ],
+        "head": [
+          "hat"
+        ],
+        "leg": [
+          "costumeLegware"
+        ],
+        "torso": [
+          "robe"
+        ]
+      },
+      "handed": {
+        "weapons": [
+          "staff"
+        ],
+        "shield": [
+          "lightShield"
+        ]
+      }
+    },
+    "thief": {
+      "armor": {
+        "arm": [
+          "arm",
+          "hand"
+        ],
+        "feet": [
+          "costumeFootware",
+          "shoes"
+        ],
+        "head": [
+          "hat",
+          "headgear"
+        ],
+        "leg": [
+          "costumeLegware",
+          "legware"
+        ],
+        "torso": [
+          "costume"
+        ]
+      },
+      "handed": {
+        "weapons": [
+          "knife",
+          "dagger",
+          "claws"
+        ],
+        "shields": [
+          "lightShield"
+        ]
+      }
+    },
+    "gladiator": {
+      "armor": {
+        "arm": [
+          "arm",
+          "hand"
+        ],
+        "feet": [
+          "boots"
+        ],
+        "head": [
+          "helmet"
+        ],
+        "leg": [
+          "heavyLegware"
+        ],
+        "torso": [
+          "chestplate"
+        ]
+      },
+      "handed": {
+        "weapons": [
+          "sword",
+          "greatsword"
+        ],
+        "shields": [
+          "lightShield"
+        ]
+      }
+    },
+    "sage": {
+      "armor": {
+        "arm": [
+          "hand"
+        ],
+        "feet": [
+          "shoes"
+        ],
+        "head": [
+          "hat"
+        ],
+        "leg": [
+          "costumeLegware"
+        ],
+        "torso": [
+          "robe"
+        ]
+      },
+      "handed": {
+        "weapons": [
+          "staff",
+          "heavyStaff"
+        ],
+        "shields": []
+      }
+    },
+    "paladin": {
+      "armor": {
+        "arm": [
+          "arm",
+          "hand"
+        ],
+        "feet": [
+          "boots"
+        ],
+        "head": [
+          "helmet"
+        ],
+        "leg": [
+          "heavyLegware"
+        ],
+        "torso": [
+          "chestplate"
+        ]
+      },
+      "handed": {
+        "weapons": [
+          "sword",
+          "dagger",
+          "claws"
+        ],
+        "shields": [
+          "lightShield",
+          "heavyShield",
+          "greatShield"
+        ]
+      }
+    },
+    "ranger": {
+      "armor": {
+        "arm": [
+          "arm"
+        ],
+        "feet": [
+          "costumeFootware"
+        ],
+        "head": [
+          "hat",
+          "headgear"
+        ],
+        "leg": [
+          "costumeLegware",
+          "legware"
+        ],
+        "torso": [
+          "costume"
+        ]
+      },
+      "handed": {
+        "weapons": [
+          "bow",
+          "dagger",
+          "knife"
+        ],
+        "shields": []
+      }
+    },
+    "martialArtist": {
+      "armor": {
+        "arm": [
+          "arm"
+        ],
+        "feet": [
+          "costumeFootware",
+          "shoes"
+        ],
+        "head": [
+          "hat",
+          "headgear"
+        ],
+        "leg": [
+          "costumeLegware",
+          "legware"
+        ],
+        "torso": [
+          "costume",
+          "robe"
+        ]
+      },
+      "handed": {
+        "weapons": [
+          "knife",
+          "dagger",
+          "claws",
+          "martialStick"
+        ],
+        "shields": []
+      }
+    }
+  }
+}

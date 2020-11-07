@@ -7,7 +7,7 @@ export interface IChoice {
   hint?: string
   disabled?: boolean | string
   effects?: ConsoleEffects;
-  process?: boolean;
+  call?: boolean;
   await?: boolean;
   args?: any[];
   action?: (...args: any[]) => any;

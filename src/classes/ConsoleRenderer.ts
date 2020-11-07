@@ -1,10 +1,12 @@
 import { Renderer, RenderFunc } from '.';
 import { Console } from '../libs';
+import { SuperConsole as CConsole } from '../libs/Console/SuperConsole';
 import { Func } from '../types';
 
 export class ConsoleRenderer {
 
   //#region properties
+  private _headers: Renderer[] = [];
   private _rendersData: Renderer[] = [];
   private pendingRenderer: Renderer;
   private pendingRender: Promise<any>;
@@ -38,6 +40,25 @@ export class ConsoleRenderer {
     return this;
   }
 
+  addHeader = (dirtyRenderer: Func | RenderFunc | Renderer): this => {
+    const renderer = this.getRenderer(dirtyRenderer);
+    //this.pendingRenderer = renderer;
+    this.headers().push(renderer);
+    return this;
+  }
+
+  addHeaderToRender = (renderer: Func | RenderFunc | Renderer): this => {
+    this.addHeader(renderer);
+    this.render();
+    return this;
+  }
+
+  addPromptToRender = (renderer: Func<CConsole>): this => {
+    return this.addToRender(
+      new Renderer(renderOptions => renderer(renderOptions).await()).setOption('saveInput', true)
+    );
+  }
+
   replaceRenderer = (index: number, renderer: Func | RenderFunc | Renderer): this => {
     this.rendersData().pop();
     this.rendersData()[index] = this.getRenderer(renderer);
@@ -61,35 +82,63 @@ export class ConsoleRenderer {
 
   clean = (): this => {
     this.setRendersData([]);
+    this.setHeaders([]);
     return this;
   }
 
   clear = (): this => {
     this.clean();
-    this.render();
+    Console.clear();
     return this;
   }
 
   render = async (): Promise<this> => {
     Console.clear();
-    const rendersData = this.rendersData().filter(r => !r.options().noRender);
 
-    for (const renderData of rendersData) {
-      renderData.clean();
-      const renderOptions = renderData.options();
-      const answer = await renderData.render();
-
-      if (renderOptions.executeOnce) {
-        renderData.setOption('noRender', true);
-      }
-
-      if (renderOptions.saveOutput) {
-        //Console.red.writeLine('saveOutput', answer)
-        renderData.setArg({ answer });
-      }
-    }
+    await this.renderHeaders();
+    await this.renderMain();
 
     return this;
+  }
+
+  private renderHeaders = async (): Promise<void> => {
+    const headers = this.getRenderable(this.headers());
+
+    for (const header of headers) {
+      await this.renderRenderer(header);
+    }
+
+    if (headers.length) {
+      Console.line();
+    }
+  }
+
+  private renderMain = async (): Promise<void> => {
+    const rendersData = this.getRenderable(this.rendersData());
+
+    for (const renderData of rendersData) {
+      await this.renderRenderer(renderData);
+    }
+  }
+
+  private renderRenderer = async (renderData: Renderer): Promise<any> => {
+    renderData.clean();
+    const renderOptions = renderData.options();
+    const answer = await renderData.render();
+
+    if (renderOptions.executeOnce) {
+      renderData.setOption('noRender', true);
+    }
+
+    if (renderOptions.saveInput) {
+      renderData.setArg({ answer });
+    }
+
+    return answer;
+  }
+
+  getRenderable = (renderers: Renderer[]): Renderer[] => {
+    return renderers.filter(r => !r.options().noRender);
   }
   //#endregion
 
@@ -100,6 +149,15 @@ export class ConsoleRenderer {
 
   private setRendersData(rendersData: Renderer[]): this {
     this._rendersData = rendersData;
+    return this;
+  }
+
+  headers(): Renderer[] {
+    return this._headers;
+  }
+
+  private setHeaders(headers: Renderer[]): this {
+    this._headers = headers;
     return this;
   }
   //#endregion

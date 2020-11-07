@@ -2,22 +2,30 @@ import { Entity } from './Entity';
 import { Console } from '../libs';
 import { NotImplementedError } from '../errors';
 import { Classes } from '../data';
+import { LiteralObject } from '../types';
 
 export class Character extends Entity {
 
   //#region properties
   private _requiredExperiences: number = 0;
-  private _experiences: number = 0;
   private _className: Classes;
-  private levelingManager;
-  private updatedStats;
-  private hasSpells: boolean;
-  private inventory;
+  private _levelingManager;
+  private _updatedStats;
+  private _inventory;
   //#endregion
 
-  static fromJson(data: Object): Character {
-    const character = Object.assign(new Character, data);
-    throw new NotImplementedError();
+  static fromJson(data: LiteralObject): Character {
+    if(!data) {
+      return;
+    }
+
+    const character = Object.assign(new Character(), super.fromJson(data));
+    character
+      .setClassName(Classes[data.className])
+      .setRequiredExperiences(data.requiredExperiences)
+      .setLevelingManager(data.levelingManager)
+      .setUpdatedStats(data.updatedStats)
+      .setInventory(data.inventory);
     return character;
   }
 
@@ -66,6 +74,42 @@ export class Character extends Entity {
 
   setClassName(className: Classes): this {
     this._className = className;
+    return this;
+  }
+
+  requiredExperiences(): number {
+    return this._requiredExperiences;
+  }
+
+  setRequiredExperiences(requiredExperiences: number): this {
+    this._requiredExperiences = requiredExperiences;
+    return this;
+  }
+
+  levelingManager(): any {
+    return this._levelingManager;
+  }
+
+  setLevelingManager(levelingManager: any): this {
+    this._levelingManager = levelingManager;
+    return this;
+  }
+
+  updatedStats(): any {
+    return this._updatedStats;
+  }
+
+  setUpdatedStats(updatedStats: any): this {
+    this._updatedStats = updatedStats;
+    return this;
+  }
+
+  inventory(): any {
+    return this._inventory;
+  }
+
+  setInventory(inventory: any): this {
+    this._inventory = inventory;
     return this;
   }
   //#endregion

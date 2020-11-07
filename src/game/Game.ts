@@ -5,10 +5,11 @@ import { IChoice } from '../libs/Console/types';
 import { NotImplementedError } from '../errors';
 import { BeginningClasses } from '../data';
 import { Character } from '../entities';
-import { ConsoleEffects } from '../libs';
+import { LiteralObject, IClassStats } from '../types';
 import { User } from './User';
-import { Stats } from '../misc';
+import { EntityStats } from '../entities';
 import { ConsoleHistory, ConsoleRenderer, Renderer } from '../classes';
+import { GameData } from '../gameData';
 
 export class Game {
 
@@ -18,15 +19,23 @@ export class Game {
 
   //#region properties
   private _user;
+  private _name: string = '';
   private _consoleHistory: ConsoleHistory = new ConsoleHistory();
   //#endregion
 
-  private constructor() {}
+  private constructor() {
+    Game._instance = this;
+  }
 
   //#region static methods
-  static fromJson(data: Object): Game {
-    const game = Object.assign(new Game, data);
-    throw new NotImplementedError();
+  private static fromJson(data: LiteralObject): Game {
+    if (!data) {
+      return;
+    }
+
+    const game = new Game()
+      .setUser(User.fromJson(data.user))
+      .setName(data.name);
     return game;
   }
   //#endregion
@@ -43,30 +52,50 @@ export class Game {
   mainMenu = async () => {
     const result = await this
       .consoleHistory()
-      .addToRender(
-        new Renderer(({ answer }) => {
-          return Console
-            .line()
-            .select('What do you want to do?', [
-              {
-                message: 'Start a new game',
-                action: this.newGame,
-              },
-              {
-                message: 'Load a game',
-                action: this.loader,
-              },
-            ], { answer })
-            .await();
-        }).setOption('saveOutput', true)
-      )
+      .addPromptToRender(({ answer }) => {
+        return Console
+          .line()
+          .select('What do you want to do?', [
+            {
+              message: 'Start a new game',
+              action: this.newGame,
+            },
+            {
+              message: 'Load a game',
+              action: this.loadGame,
+            },
+          ], { answer });
+        })
       .await<IChoice>();
 
     await result.action();
   }
 
-  loader = () => {
-    throw new NotImplementedError();
+  loadGame = async () => {
+    const savesName = await GameData.get().getSavesName();
+    const choices = savesName.map(saveName => {
+      return {
+        message: saveName,
+        action: this.loader,
+        args: [saveName],
+        call: true,
+        await: true,
+      }
+    });
+
+    await this
+      .consoleHistory()
+      .addPromptToRender(({ answer }) => {
+        return Console
+          .line()
+          .select('What save do you want to load?', choices, { answer });
+        })
+      .await<IChoice>();
+  }
+
+  private loader = async (saveName: string) => {
+    const save = await GameData.get().load(saveName);
+    Game.fromJson(save).start();
   }
 
   newGame = () => {
@@ -81,57 +110,61 @@ export class Game {
 
     const result = await this
       .consoleHistory()
-      .addToRender(
-        new Renderer(({ answer }) => {
-          return Console.line().select('What is your class?', choices, { answer }).await();
-        }).setOption('saveOutput', true)
-      )
+      .addPromptToRender(({ answer }) => {
+        return Console.line().select('What is your class?', choices, { answer });
+      })
       .await<IChoice>();
 
     const character = new Character().setClassName(BeginningClasses[result.message.toLowerCase()]);
     await result.action(character);
-    /*const answer = await Console.line().select('What is your class?', choices);
-    const character = new Character().setClassName(BeginningClasses[answer.message.toLowerCase()]);
-    await answer.action(character);*/
   }
 
   private chooseName = async (character: Character) => {
-
     const name = await this
       .consoleHistory()
-      .addToRender(
-        new Renderer(({ answer }) => {
-          return Console.line().prompt('What is your name?', {
-            validate: value => !!value.trim(),
-            answer,
-          });
-        })
-      )
+      .addPromptToRender(({ answer }) => {
+        return Console.line().prompt('What is your name?', {
+          validate: value => !!value.trim(),
+          answer,
+        });
+      })
       .await<string>();
 
-    character.setName(name).setStats(new Stats().increaseHealth(20));
+    await this.consoleHistory().addToRender(() => {}).await();
+    const gameData = GameData.get();
+    const classStats = await gameData.getObject(gameData.statsPath(), character.className()) as IClassStats;
+
+    character.setName(name).setStats(new EntityStats().init(classStats));
     this.createGame(character);
   }
 
-  private createGame = async (character: Character) => {
-    this.setUser(new User().pushCharacter(character));
-    await Console
-      .line()
-      .greenBright.write('The game is starting')
-      .greenBright.dots()
-      .await();
+  private createGame = (character: Character) => {
+    const name = character.name();
 
-    Console.clear();
+    this
+      .setName(name)
+      .setUser(new User().setName(name).pushCharacter(character));
+
+    GameData.get().save(this);
     this.start();
   }
 
-  private start = () => {
+  private start = async () => {
+    await Console
+      .line(2)
+      .greenBright.write('The game is starting')
+      // TODO uncomment when not in test
+      //.greenBright.dots()
+      .greenBright.dots(0)
+      .await();
+
+    this.consoleHistory().newRender();
     this.user().chooseAction();
   }
   //#endregion
 
   //#region static accessors
-  static instance(): Game {
+  static get(): Game {
     if (!Game._instance) {
       Game._instance = new Game();
     }
@@ -141,6 +174,15 @@ export class Game {
   //#endregion
 
   //#region accessors
+  name(): string {
+    return this._name;
+  }
+
+  private setName(name: string): this {
+    this._name = name;
+    return this;
+  }
+
   user(): User {
     return this._user;
   }
@@ -152,11 +194,6 @@ export class Game {
 
   consoleHistory(): ConsoleHistory {
     return this._consoleHistory;
-  }
-
-  private setConsoleHistory(consoleHistory: ConsoleHistory): this {
-    this._consoleHistory = consoleHistory;
-    return this;
   }
   //#endregion
 }

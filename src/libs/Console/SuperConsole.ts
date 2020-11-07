@@ -4,7 +4,7 @@ import chalk from 'chalk'
 
 import { Console } from './Console';
 import { ConsoleEffects } from './ConsoleEffects';
-import { inRange } from './utils';
+import { inRange, call } from './utils';
 import { symbols } from './symbols';
 import {
   IArrayPromptOptions,
@@ -18,8 +18,36 @@ import {
 } from './types';
 
 const messageColor = '#bbb';
+let i = 0;
 
 export class SuperConsole extends Console {
+
+  _prompt: any;
+
+  promptWrapper(Prompt: any, options: any, transformResult?: ({ answer: string }) => any) {
+    let { answer, message } = options;
+
+    this.queue.addAndProcess(async () => {
+      if (!answer) {
+        const prompt = new Prompt({
+          ...options,
+          name: message,
+          message: this.hex(messageColor).format(message),
+        });
+
+        this._prompt = prompt;
+        answer = await prompt.run();
+      } else {
+        await this.printAnswer(message, answer);
+      }
+
+      if (transformResult) {
+        answer = await transformResult({ answer });
+      }
+
+      return answer;
+    });
+  }
 
   select(message: string, choices: IChoice[], options: IArrayPromptOptions = {}): this {
     options.limit ??= 7;
@@ -30,83 +58,69 @@ export class SuperConsole extends Console {
     }
 
     const { answer: dirtyAnswer } = options;
-    let answer: string | undefined = typeof dirtyAnswer === 'string'
+    const answer: string | undefined = typeof dirtyAnswer === 'string'
       ? dirtyAnswer
       : typeof dirtyAnswer === 'object' && dirtyAnswer
         ? dirtyAnswer.message
         : undefined;
 
-    this.queue.addAndProcess(async () => {
-      choices.forEach(c => {
-        c.name ??= c.message;
-        if (c.effects) {
-          c.message = c.effects.format(c.message);
-        }
-      });
-
-      if (!answer) {
-        // @ts-ignore
-        const prompt = new Enquirer.Select({
-          ...options,
-          name: message,
-          message: this.hex(messageColor).format(message),
-          choices: choices,
-        });
-
-        answer = await prompt.run();
-      } else {
-        await this.printAnswer(message, answer);
+    choices.forEach(c => {
+      c.name ??= c.message;
+      if (c.effects) {
+        c.message = c.effects.format(c.message);
       }
+    });
 
-      const choice = choices.find(c => c.message === answer);
+    this.promptWrapper(
+      // @ts-ignore
+      Enquirer.Select,
+      {
+        ...options,
+        message,
+        choices,
+        answer,
+      },
+      async ({ answer }) => {
+        const choice = choices.find(c => c.message === answer);
 
-      if (choice.process && choice.action) {
-        const result = choice.action(...choice.args || []);
-
-        if (choice.await) {
-          return await result;
+        if (!choice.call) {
+          return choice;
         }
 
-        return result;
+        return await call(choice.action, choice.args || [], { call: choice.call, await: choice.await });
       }
+    );
 
-      return choice;
+    return this;
+  }
+
+  numberPrompt(message: string, options: INumberPromptOptions = {}): this {
+    const { answer: dirtyAnswer } = options;
+    const answer: number | undefined = typeof dirtyAnswer === 'number'
+      ? dirtyAnswer
+      : undefined;
+
+    // @ts-ignore
+    this.promptWrapper(Enquirer.NumberPrompt, {
+      ...options,
+      message,
+      answer,
     });
 
     return this;
   }
 
-  async numberPrompt(message: string, options: INumberPromptOptions = {}): Promise<number> {
-    // @ts-ignore
-    const prompt = new Enquirer.NumberPrompt({
-      ...options,
-      name: message,
-      message: this.hex(messageColor).format(message),
-    });
-
-    return await prompt.run();
-  }
-
   prompt(message: string, options: IStringPromptOptions = {}): this {
     const { answer: dirtyAnswer } = options;
-    let answer: string | undefined = typeof dirtyAnswer === 'string'
+    const answer: string | undefined = typeof dirtyAnswer === 'string'
       ? dirtyAnswer
       : undefined;
 
-
-    this.queue.addAndProcess(async () => {
-      if (!answer) {
-        // @ts-ignore
-        const prompt = new Enquirer.Input({
-          ...options,
-          name: message,
-          message: this.hex(messageColor).format(message),
-        });
-
-        answer = await prompt.run();
-      } else {
-        await this.printAnswer(message, answer);
-      }
+    // @ts-ignore
+    this.promptWrapper(Enquirer.Input, {
+      ...options,
+      message,
+      answer,
     });
 
     return this;
@@ -118,6 +132,6 @@ export class SuperConsole extends Console {
       .hex(messageColor).write('', message, '')
       .white.write(symbols.separator.submitted, '')
       .cyan.write(answer)
-      /*.line()*/.await();
+      .await();
   }
 }

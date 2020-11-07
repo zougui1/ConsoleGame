@@ -1,3 +1,6 @@
+import readline from 'readline';
+import tty from 'tty';
+
 import { ConsoleEffects } from './ConsoleEffects';
 import { Queue } from './Queue';
 import { wait } from './utils';
@@ -8,6 +11,18 @@ export class Console extends ConsoleEffects {
 
   protected queue = new Queue();
   private _progressionTimeout = defaultProgressionTimeout;
+  // need an interface to resume, resuming on process.stdin directly can
+  // be have conflict with the library enquirer and cause unexpected behavior
+  private rl = readline.createInterface({ terminal: true, input: process.stdin });
+
+  constructor() {
+    super();
+
+    // enable keypress events on process.stdin
+    readline.emitKeypressEvents(process.stdin);
+    // disable any behavior in the terminal done by nodejs
+    process.stdin.setRawMode(true);
+  }
 
   private partialWrite(...messages: unknown[]): this {
     const message = this.format(...messages);
@@ -100,6 +115,32 @@ export class Console extends ConsoleEffects {
     this.writeLine(str.repeat(this.width() - 1));
     return this;
   }
+
+  on(event: string, handler: (str: string, key: IKeyPress) => any): this {
+    this.listen('on', event, handler);
+    return this;
+  }
+
+  once(event: string, handler: (str: string, key: IKeyPress) => any): this {
+    this.listen('once', event, handler);
+    return this;
+  }
+
+  off(event: string, handler: (str: string, key: IKeyPress) => any): this {
+    this.listen('off', event, handler);
+    return this;
+  }
+
+  readers = {};
+
+  private listen(listenType: string, event: string, handler: (str: string, key: IKeyPress) => any) {
+    // need an interface to resume, resuming on process.stdin directly can
+    // have conflicts with the library enquirer and causes unexpected behaviors
+    const rl = readline.createInterface({ terminal: true, input: process.stdin });
+    process.stdin[listenType](event, handler);
+    // need to resume the listening in the terminal that may be paused by the library eqnuirer
+    rl.resume();
+  }
   //#endregion
 
   //#region console accessors
@@ -111,4 +152,13 @@ export class Console extends ConsoleEffects {
     return process.stdout.rows;
   }
   //#endregion
+}
+
+interface IKeyPress {
+  sequence: string;
+  name: string;
+  ctrl: boolean;
+  meta: boolean;
+  shift: boolean;
+  code?: string;
 }

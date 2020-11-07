@@ -1,0 +1,27 @@
+{
+  "data": [
+    {
+      "id": 0,
+      "category": "kingdom",
+      "name": "First kingdom",
+      "coords": {
+        "x": 0,
+        "y": -1
+      },
+      "metadata": {
+        "buildings": [
+          {
+            "id": 0,
+            "file": "buildings.json"
+          }
+        ],
+        "npcs": [
+          {
+            "id": 1,
+            "file": "npcs.json"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -6,3 +6,4 @@ export * from './SpawnData';
 export * from './Spell';
 export * from './Stats';
 export * from './Zone';
+export * from './Item';

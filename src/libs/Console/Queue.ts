@@ -46,7 +46,7 @@ export class Queue {
   }
 
   async await(): Promise<any> {
-    return await this.queue[this.queue.length - 1]();
+    return await this.queue[this.queue.length - 1]?.();
   }
 
   async processQueue() {

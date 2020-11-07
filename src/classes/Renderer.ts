@@ -26,6 +26,8 @@ export class Renderer {
 
       if (typeof result?.then === 'function') {
         result = await result;
+      } else if (typeof result?.await === 'function') {
+        result = await result.await();
       }
 
       return result;
@@ -87,7 +89,7 @@ export class Renderer {
 export type RenderFunc = (...args: any[]) => Promise<any>;
 
 interface IRendererOptions {
-  saveOutput?: boolean;
+  saveInput?: boolean;
   executeOnce?: boolean;
   noRender?: boolean;
 }

@@ -1,9 +1,8 @@
 import prettyError from 'pretty-error';
 
-import { Console } from './libs';
 import { Game } from './game';
-import { ConsoleRenderer, Renderer, ConsoleHistory } from './classes';
-import { wait } from './utils';
+import { Console } from './libs';
+import { GameData } from './gameData';
 
 process.on('unhandledRejection', err => {
   if (!err) {
@@ -18,31 +17,29 @@ process.on('uncaughtException', err => {
   console.error('Uncaught exception:', err);
   process.exit(1);
 });
+/*
+const SHUTDOWN_SIGNALS = [
+  'SIGHUP', 'SIGINT', 'SIGQUIT', 'SIGILL', 'SIGTRAP', 'SIGABRT',
+  'SIGBUS', 'SIGFPE', 'SIGUSR1', 'SIGSEGV', 'SIGUSR2', 'SIGTERM',
+  'beforeExit', 'exit',
+].forEach(sig => {
+  process.on(sig, (...args) => {
+    console.log('exit:', sig, 'args:', args);
+  })
+})*/
+
+Console.on('keypress', (str, key) => {
+  if (key.ctrl && key.name === 'c') {
+    console.log();
+    process.exit(0);
+  }
+  //console.log(key, str)
+});
 
 prettyError.start();
-const game = Game.instance();
+const game = Game.get();
 game.init();
+
 /*(async () => {
-  const t = async resolve => {
-    console.log('t')
-    //resolve(null);
-    return 'some val'
-  }
-  await t
+  console.log(await GameData.get().getFullObjectData(GameData.get().locationsPath(), 0));
 })()*/
-/*
-const t = async (callback) => {
-  setTimeout(() => {
-    console.log('some promise');
-    callback();
-  }, 2000)
-};
-
-const tt = () => new Promise(t);
-
-(async () => {
-  await tt();
-  await t;
-})()
-*/
-//setTimeout(() => { }, 1000);

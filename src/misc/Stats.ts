@@ -1,95 +1,44 @@
-import { NotImplementedError } from '../errors';
-import { clamp } from '../utils';
+import { LiteralObject } from '../types';
 
 export class Stats {
 
   //#region properties
-  private _maxHealth: number = 0;
   private _health: number = 0;
-  private _maxMana: number = 0;
   private _mana: number = 0;
   private _strength: number = 0;
-  private _resistance: number = 0;
+  private _defense: number = 0;
   private _magicalMight: number = 0;
   private _magicalMending: number = 0;
   private _agility: number = 0;
   private _deftness: number = 0;
   //#endregion
 
-  static fromJson(data: Object): Stats {
-    const stats = Object.assign(new Stats, data);
-    throw new NotImplementedError();
+  //#region static methods
+  static fromJson(data: LiteralObject): Stats {
+    if (!data) {
+      return;
+    }
+
+    const stats = new Stats()
+      .setHealth(data.health)
+      .setMana(data.mana)
+      .setStrength(data.strength)
+      .setDefense(data.defense)
+      .setMagicalMight(data.magicalMight)
+      .setMagicalMending(data.magicalMending)
+      .setAgility(data.agility)
+      .setDeftness(data.deftness);
     return stats;
-  }
-
-  //#region methods
-  healthHeal = (heal: number): this => {
-    this.setHealth(Math.min(this.maxHealth(), this.health() + heal));
-    return this;
-  }
-
-  manaHeal = (heal: number): this => {
-    this.setMana(Math.min(this.maxMana(), this.mana() + heal));
-    return this;
-  }
-
-  consumeHealth = (num: number): this => {
-    this.setHealth(this.health() - num);
-    return this;
-  }
-
-  consumeMana = (num: number): this => {
-    this.setMana(this.mana() - num);
-    return this;
-  }
-
-  increaseHealth = (num: number): this => {
-    this.setMaxHealth(this.maxHealth() + num);
-    this.setHealth(this.health() + num);
-    return this;
-  }
-
-  increaseMana = (num: number): this => {
-    this.setMaxMana(this.maxMana() + num);
-    this.setMana(this.mana() + num);
-    return this;
-  }
-
-  healthFullHeal = (): this => {
-    this.setHealth(this.maxHealth());
-    return this;
-  }
-
-  manaFullHeal = (): this => {
-    this.setMana(this.maxMana());
-    return this;
   }
   //#endregion
 
   //#region accessors
-  maxHealth(): number {
-    return this._maxHealth;
-  }
-
-  setMaxHealth(maxHealth: number): this {
-    this._maxHealth = Math.max(0, maxHealth);
-    return this;
-  }
-
   health(): number {
     return this._health;
   }
 
   setHealth(health: number): this {
-    this._health = clamp(health, 0, this.maxHealth());
-    return this;
-  }
-  maxMana(): number {
-    return this._maxMana;
-  }
-
-  setMaxMana(maxMana: number): this {
-    this._maxMana = Math.max(0, maxMana);
+    this._health = health ?? this._health;
     return this;
   }
 
@@ -98,7 +47,7 @@ export class Stats {
   }
 
   setMana(mana: number): this {
-    this._mana = clamp(mana, 0, this.maxMana());
+    this._mana = mana ?? this._mana;
     return this;
   }
 
@@ -107,16 +56,16 @@ export class Stats {
   }
 
   setStrength(strength: number): this {
-    this._strength = Math.max(0, strength);
+    this._strength = strength ?? this._strength;
     return this;
   }
 
-  resistance(): number {
-    return this._resistance;
+  defense(): number {
+    return this._defense;
   }
 
-  setResistance(resistance: number): this {
-    this._resistance = Math.max(0, resistance);
+  setDefense(defense: number): this {
+    this._defense = defense ?? this._defense;
     return this;
   }
 
@@ -125,7 +74,7 @@ export class Stats {
   }
 
   setMagicalMight(magicalMight: number): this {
-    this._magicalMight = Math.max(0, magicalMight);
+    this._magicalMight = magicalMight ?? this._magicalMight;
     return this;
   }
 
@@ -134,7 +83,7 @@ export class Stats {
   }
 
   setMagicalMending(magicalMending: number): this {
-    this._magicalMending = Math.max(0, magicalMending);
+    this._magicalMending = magicalMending ?? this._magicalMending;
     return this;
   }
 
@@ -143,7 +92,7 @@ export class Stats {
   }
 
   setAgility(agility: number): this {
-    this._agility = Math.max(0, agility);
+    this._agility = agility ?? this._agility;
     return this;
   }
 
@@ -152,7 +101,7 @@ export class Stats {
   }
 
   setDeftness(deftness: number): this {
-    this._deftness = Math.max(0, deftness);
+    this._deftness = deftness ?? this._deftness;
     return this;
   }
   //#endregion
