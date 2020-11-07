@@ -1,0 +1,193 @@
+{
+  "data": [
+    {
+      "id": 0,
+      "coords": {
+        "x": 0,
+        "y": 0
+      },
+      "rect": {
+        "width": 10,
+        "height": 10
+      },
+      "spawnings": [
+        {
+          "monsterId": 0,
+          "percent": 165
+        },
+        {
+          "monsterId": 1,
+          "percent": 0
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "coords": {
+        "x": -11,
+        "y": 0
+      },
+      "rect": {
+        "width": 10,
+        "height": 10
+      },
+      "spawnings": [
+        {
+          "monsterId": 1,
+          "percent": 80
+        },
+        {
+          "monsterId": 0,
+          "percent": 20
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "coords": {
+        "x": 0,
+        "y": -11
+      },
+      "rect": {
+        "width": 10,
+        "height": 10
+      },
+      "spawnings": [
+        {
+          "monsterId": 1,
+          "percent": 80
+        },
+        {
+          "monsterId": 0,
+          "percent": 20
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "coords": {
+        "x": 11,
+        "y": 0
+      },
+      "rect": {
+        "width": 10,
+        "height": 10
+      },
+      "spawnings": [
+        {
+          "monsterId": 1,
+          "percent": 80
+        },
+        {
+          "monsterId": 0,
+          "percent": 20
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "coords": {
+        "x": 0,
+        "y": 11
+      },
+      "rect": {
+        "width": 10,
+        "height": 10
+      },
+      "spawnings": [
+        {
+          "monsterId": 1,
+          "percent": 80
+        },
+        {
+          "monsterId": 0,
+          "percent": 20
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "coords": {
+        "x": 11,
+        "y": 11
+      },
+      "rect": {
+        "width": 10,
+        "height": 10
+      },
+      "spawnings": [
+        {
+          "monsterId": 1,
+          "percent": 80
+        },
+        {
+          "monsterId": 0,
+          "percent": 20
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "coords": {
+        "x": -11,
+        "y": 11
+      },
+      "rect": {
+        "width": 10,
+        "height": 10
+      },
+      "spawnings": [
+        {
+          "monsterId": 1,
+          "percent": 80
+        },
+        {
+          "monsterId": 0,
+          "percent": 20
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "coords": {
+        "x": 11,
+        "y": -11
+      },
+      "rect": {
+        "width": 10,
+        "height": 10
+      },
+      "spawnings": [
+        {
+          "monsterId": 1,
+          "percent": 80
+        },
+        {
+          "monsterId": 0,
+          "percent": 20
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "coords": {
+        "x": -11,
+        "y": -11
+      },
+      "rect": {
+        "width": 10,
+        "height": 10
+      },
+      "spawnings": [
+        {
+          "monsterId": 1,
+          "percent": 80
+        },
+        {
+          "monsterId": 0,
+          "percent": 20
+        }
+      ]
+    }
+  ]
+}

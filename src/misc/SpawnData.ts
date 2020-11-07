@@ -1,14 +1,27 @@
+import { LiteralObject } from '../types';
+
 export class SpawnData {
 
   //#region properties
   private _monsterId: number;
-  private _percent: number;
+  private _spawnChance: number;
   //#endregion
 
-  constructor(monsterId: number, percent: number) {
+  constructor(monsterId: number, spawnChance: number) {
     this._monsterId = monsterId;
-    this._percent = percent;
+    this._spawnChance = spawnChance;
   }
+
+  //#region static methods
+  static fromJson(data: LiteralObject): SpawnData {
+    if (!data) {
+      return;
+    }
+
+    const spawnData = new SpawnData(data.monsterId, data.spawnChance);
+    return spawnData;
+  }
+  //#endregion
 
   //#region accessors
   monsterId(): number {
@@ -20,12 +33,12 @@ export class SpawnData {
     return this;
   }
 
-  percent(): number {
-    return this._percent;
+  spawnChance(): number {
+    return this._spawnChance;
   }
 
-  private setPercent(percent: number): this {
-    this._percent = percent;
+  private setSpawnChance(spawnChance: number): this {
+    this._spawnChance = spawnChance;
     return this;
   }
   //#endregion

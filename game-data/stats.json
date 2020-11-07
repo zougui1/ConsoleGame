@@ -119,6 +119,16 @@
       "agility": 5,
       "deftness": 5,
       "branch": "archer"
+    },
+    {
+      "id": "monk",
+      "name": "Monk",
+      "branch": "monk"
+    },
+    {
+      "id": "martialArtist",
+      "name": "Martial artist",
+      "branch": "monk"
     }
   ]
 }

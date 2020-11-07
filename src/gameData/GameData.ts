@@ -22,6 +22,8 @@ export class GameData {
   private _locationsPath: string = this.fromGameData('locations.json');
   private _npcsPath: string = this.fromGameData('npcs.json');
   private _statsPath: string = this.fromGameData('stats.json');
+  private _mapPath: string = this.fromGameData('map.json');
+  private _zonesPath: string = this.fromGameData('zones.json');
   //#endregion
 
   //#region functions
@@ -294,6 +296,24 @@ export class GameData {
 
   setStatsPath(statsPath: string): this {
     this._statsPath = statsPath;
+    return this;
+  }
+
+  mapPath(): string {
+    return this._mapPath;
+  }
+
+  setMapPath(mapPath: string): this {
+    this._mapPath = mapPath;
+    return this;
+  }
+
+  zonesPath(): string {
+    return this._zonesPath;
+  }
+
+  setZonesPath(zonesPath: string): this {
+    this._zonesPath = zonesPath;
     return this;
   }
   //#endregion

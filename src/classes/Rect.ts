@@ -1,3 +1,4 @@
+import { LiteralObject } from '../types';
 import { inRange } from '../utils';
 
 export class Rect {
@@ -16,16 +17,27 @@ export class Rect {
     this._height = height;
   }
 
-  //#region methods
-  maxX(): number {
+  //#region static methods
+  static fromJson(data: LiteralObject): Rect {
+    if (!data) {
+      return;
+    }
+
+    const rect = new Rect(data.x, data.y, data.width, data.height);
+    return rect;
+  }
+  //#endregion
+
+  //#region functions
+  maxX = (): number => {
     return this.x() + this.width();
   }
 
-  maxY(): number {
+  maxY = (): number => {
     return this.y() + this.height();
   }
 
-  isWithin(x: number, y: number): boolean {
+  isWithin = (x: number, y: number): boolean => {
     return inRange(x, this.x(), this.maxX()) && inRange(y, this.y(), this.maxY());
   }
   //#endregion
