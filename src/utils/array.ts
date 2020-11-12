@@ -1,3 +1,5 @@
-export const last = <T>(array: T[]): T => {
-  return array[array.length - 1];
+export const toArray = <T>(val: T | T[]): T[] => {
+  return Array.isArray(val)
+    ? val
+    : [val];
 }

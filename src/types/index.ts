@@ -1,4 +1,4 @@
-export * from './FileDataMetadata';
-export * from './Func';
 export * from './LiteralObject';
-export * from './IClassStats';
+export * from './Func';
+export * from './IPoint';
+export * from './ReturnableValue';

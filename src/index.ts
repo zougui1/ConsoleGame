@@ -1,45 +1,40 @@
-import prettyError from 'pretty-error';
+import './formatErrors';
+//import './initGame';
+import './process';
+import './console';
 
-import { Game } from './game';
-import { Console } from './libs';
-import { GameData } from './gameData';
+import { terminal as term } from 'terminal-kit';
 
-process.on('unhandledRejection', err => {
-  if (!err) {
-    console.log('Process exit');
-  } else {
-    console.error('Unhandled rejection:', err);
-  }
+import { Layout } from './UiLayer/classes';
+import { overlay } from './UiLayer/printers';
 
-  process.exit(0);
-});
-process.on('uncaughtException', err => {
-  console.error('Uncaught exception:', err);
-  process.exit(1);
-});
-/*
-const SHUTDOWN_SIGNALS = [
-  'SIGHUP', 'SIGINT', 'SIGQUIT', 'SIGILL', 'SIGTRAP', 'SIGABRT',
-  'SIGBUS', 'SIGFPE', 'SIGUSR1', 'SIGSEGV', 'SIGUSR2', 'SIGTERM',
-  'beforeExit', 'exit',
-].forEach(sig => {
-  process.on(sig, (...args) => {
-    console.log('exit:', sig, 'args:', args);
-  })
-})*/
-
-Console.on('keypress', (str, key) => {
-  if (key.ctrl && key.name === 'c') {
-    console.log();
-    process.exit(0);
-  }
-  //console.log(key, str)
-});
-
-prettyError.start();
-const game = Game.get();
-game.init();
-
-/*(async () => {
-  console.log(await GameData.get().getFullObjectData(GameData.get().locationsPath(), 0));
-})()*/
+(async () => {
+  await Layout
+    .get()
+    .setHeader([
+      {
+        term: term.red,
+        message: [
+          'Header',
+        ],
+        line: true,
+      },
+      {
+        term: term.yellow,
+        message: [
+          'Harum sit voluptatem vel alias expedita cumque. Aperiam voluptates porro ut earum corrupti quae et beatae. Dolore veniam et harum veritatis rerum amet.',
+          '\n',
+        ],
+      },
+      {
+        term: term.blue,
+        message: 'I won\'t be printed D:\n',
+      },
+      () => term('I won\'t be printed either but I don\'t care >:D\n'),
+    ])
+    //.setHeader(() => term('I\ncan\nprint\nas\nmany\nlines\nas\nI\nwant\nnobody\ncan\nstop\nme\n'))
+    .pushContent(() => term('Main content'))
+    .setFooter('Footer with a lot of content for a really super text because why not')
+    .setOverlay(() => overlay('My super responsive overlay :o\nwith a really, very, super long content text full of strings', { maxHeight: 15, maxWidth: 50, title: 'Overlay title!' }))
+    .render();
+})()

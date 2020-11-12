@@ -13,6 +13,7 @@ dependencies:
 devDependencies:
   '@types/lodash': 4.14.164
   '@types/node': 14.14.6
+  '@types/terminal-kit': 1.28.2
   source-map-support: 0.5.19
   tsc-watch: 4.2.9_typescript@4.0.5
   typescript: 4.0.5
@@ -33,10 +34,20 @@ packages:
     dev: true
     resolution:
       integrity: sha512-fXCEmONnrtbYUc5014avwBeMdhHHO8YJCkOBflUL9EoJBSKZ1dei+VO74fA7JkTHZ1GvZack2TyIw5U+1lT8jg==
+  /@types/nextgen-events/1.1.0:
+    dev: true
+    resolution:
+      integrity: sha512-vRh1NWJKNuhdeo0x85veoA7gZTC9IIC9LSmFUHT5Vk50rH/SDvXy4gKarcT4rLfBWxOIfyozpX/IHAAnz4oWTg==
   /@types/node/14.14.6:
     dev: true
     resolution:
       integrity: sha512-6QlRuqsQ/Ox/aJEQWBEJG7A9+u7oSYl3mem/K8IzxXG/kAGbV1YPD9Bg9Zw3vyxC/YP+zONKwy8hGkSt1jxFMw==
+  /@types/terminal-kit/1.28.2:
+    dependencies:
+      '@types/nextgen-events': 1.1.0
+    dev: true
+    resolution:
+      integrity: sha512-OZeTE0lE5N1MZJZfiHU2RgcH4zGpKF8K2vkKq1KsjsLqkrrLLmHrUjWzyJ3R+c4xNwNff4nID1vQn1CejVnFsw==
   /ansi-colors/4.1.1:
     dev: false
     engines:
@@ -1015,6 +1026,7 @@ packages:
 specifiers:
   '@types/lodash': ^4.14.162
   '@types/node': ^14.11.8
+  '@types/terminal-kit': ^1.28.2
   ansi-colors: ^4.1.1
   asap: ^2.0.6
   chalk: ^4.1.0

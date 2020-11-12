@@ -7,22 +7,22 @@
           "name": "Zougui",
           "level": 1,
           "experiences": 0,
+          "requiredExperiences": 0,
           "defending": false,
           "dodgeChancePerAgility": 0.05,
           "criticalChancePerDeftness": 0.075,
-          "requiredExperiences": 0,
           "className": "warrior",
           "stats": {
             "maxHealth": 15,
             "health": 15,
             "maxMana": 0,
             "mana": 0,
-            "strength": 5,
+            "strength": 6,
             "resistance": 3,
             "magicalMight": 0,
             "magicalMending": 0,
             "agility": 2,
-            "deftness": 2
+            "deftness": 3
           }
         }
       ],
@@ -31,6 +31,356 @@
         "y": 0
       },
       "name": "Zougui",
+      "gold": 0
+    }
+  },
+  {
+    "name": "hgy",
+    "user": {
+      "characters": [
+        {
+          "name": "hgy",
+          "level": 1,
+          "experiences": 0,
+          "requiredExperiences": 0,
+          "defending": false,
+          "dodgeChancePerAgility": 0.05,
+          "criticalChancePerDeftness": 0.075,
+          "className": "warrior",
+          "stats": {
+            "maxHealth": 15,
+            "health": 15,
+            "maxMana": 0,
+            "mana": 0,
+            "strength": 6,
+            "resistance": 3,
+            "magicalMight": 0,
+            "magicalMending": 0,
+            "agility": 2,
+            "deftness": 3
+          }
+        }
+      ],
+      "coords": {
+        "x": 0,
+        "y": 0
+      },
+      "name": "hgy",
+      "gold": 0
+    }
+  },
+  {
+    "name": "hu",
+    "user": {
+      "characters": [
+        {
+          "name": "hu",
+          "level": 1,
+          "experiences": 0,
+          "requiredExperiences": 0,
+          "defending": false,
+          "dodgeChancePerAgility": 0.05,
+          "criticalChancePerDeftness": 0.075,
+          "className": "warrior",
+          "stats": {
+            "maxHealth": 15,
+            "health": 15,
+            "maxMana": 0,
+            "mana": 0,
+            "strength": 6,
+            "resistance": 3,
+            "magicalMight": 0,
+            "magicalMending": 0,
+            "agility": 2,
+            "deftness": 3
+          }
+        }
+      ],
+      "coords": {
+        "x": 0,
+        "y": 0
+      },
+      "name": "hu",
+      "gold": 0
+    }
+  },
+  {
+    "name": "h",
+    "user": {
+      "characters": [
+        {
+          "name": "h",
+          "level": 1,
+          "experiences": 0,
+          "requiredExperiences": 0,
+          "defending": false,
+          "dodgeChancePerAgility": 0.05,
+          "criticalChancePerDeftness": 0.075,
+          "className": "warrior",
+          "stats": {
+            "maxHealth": 15,
+            "health": 15,
+            "maxMana": 0,
+            "mana": 0,
+            "strength": 6,
+            "resistance": 3,
+            "magicalMight": 0,
+            "magicalMending": 0,
+            "agility": 2,
+            "deftness": 3
+          }
+        }
+      ],
+      "coords": {
+        "x": 0,
+        "y": 0
+      },
+      "name": "h",
+      "gold": 0
+    }
+  },
+  {
+    "name": "g",
+    "user": {
+      "characters": [
+        {
+          "name": "g",
+          "level": 1,
+          "experiences": 0,
+          "requiredExperiences": 0,
+          "defending": false,
+          "dodgeChancePerAgility": 0.05,
+          "criticalChancePerDeftness": 0.075,
+          "className": "warrior",
+          "stats": {
+            "maxHealth": 15,
+            "health": 15,
+            "maxMana": 0,
+            "mana": 0,
+            "strength": 6,
+            "resistance": 3,
+            "magicalMight": 0,
+            "magicalMending": 0,
+            "agility": 2,
+            "deftness": 3
+          }
+        }
+      ],
+      "coords": {
+        "x": 0,
+        "y": 0
+      },
+      "name": "g",
+      "gold": 0
+    }
+  },
+  {
+    "name": "u",
+    "user": {
+      "characters": [
+        {
+          "name": "u",
+          "level": 1,
+          "experiences": 0,
+          "requiredExperiences": 0,
+          "defending": false,
+          "dodgeChancePerAgility": 0.05,
+          "criticalChancePerDeftness": 0.075,
+          "className": "warrior",
+          "stats": {
+            "maxHealth": 15,
+            "health": 15,
+            "maxMana": 0,
+            "mana": 0,
+            "strength": 6,
+            "resistance": 3,
+            "magicalMight": 0,
+            "magicalMending": 0,
+            "agility": 2,
+            "deftness": 3
+          }
+        }
+      ],
+      "coords": {
+        "x": 0,
+        "y": 0
+      },
+      "name": "u",
+      "gold": 0
+    }
+  },
+  {
+    "name": "r",
+    "user": {
+      "characters": [
+        {
+          "name": "r",
+          "level": 1,
+          "experiences": 0,
+          "requiredExperiences": 0,
+          "defending": false,
+          "dodgeChancePerAgility": 0.05,
+          "criticalChancePerDeftness": 0.075,
+          "className": "warrior",
+          "stats": {
+            "maxHealth": 15,
+            "health": 15,
+            "maxMana": 0,
+            "mana": 0,
+            "strength": 6,
+            "resistance": 3,
+            "magicalMight": 0,
+            "magicalMending": 0,
+            "agility": 2,
+            "deftness": 3
+          }
+        }
+      ],
+      "coords": {
+        "x": 0,
+        "y": 0
+      },
+      "name": "r",
+      "gold": 0
+    }
+  },
+  {
+    "name": "gt$",
+    "user": {
+      "characters": [
+        {
+          "name": "gt$",
+          "level": 1,
+          "experiences": 0,
+          "requiredExperiences": 0,
+          "defending": false,
+          "dodgeChancePerAgility": 0.05,
+          "criticalChancePerDeftness": 0.075,
+          "className": "warrior",
+          "stats": {
+            "maxHealth": 15,
+            "health": 15,
+            "maxMana": 0,
+            "mana": 0,
+            "strength": 6,
+            "resistance": 3,
+            "magicalMight": 0,
+            "magicalMending": 0,
+            "agility": 2,
+            "deftness": 3
+          }
+        }
+      ],
+      "coords": {
+        "x": 0,
+        "y": 0
+      },
+      "name": "gt$",
+      "gold": 0
+    }
+  },
+  {
+    "name": "t",
+    "user": {
+      "characters": [
+        {
+          "name": "t",
+          "level": 1,
+          "experiences": 0,
+          "requiredExperiences": 0,
+          "defending": false,
+          "dodgeChancePerAgility": 0.05,
+          "criticalChancePerDeftness": 0.075,
+          "className": "warrior",
+          "stats": {
+            "maxHealth": 15,
+            "health": 15,
+            "maxMana": 0,
+            "mana": 0,
+            "strength": 6,
+            "resistance": 3,
+            "magicalMight": 0,
+            "magicalMending": 0,
+            "agility": 2,
+            "deftness": 3
+          }
+        }
+      ],
+      "coords": {
+        "x": 0,
+        "y": 0
+      },
+      "name": "t",
+      "gold": 0
+    }
+  },
+  {
+    "name": "y",
+    "user": {
+      "characters": [
+        {
+          "name": "y",
+          "level": 1,
+          "experiences": 0,
+          "requiredExperiences": 0,
+          "defending": false,
+          "dodgeChancePerAgility": 0.05,
+          "criticalChancePerDeftness": 0.075,
+          "className": "warrior",
+          "stats": {
+            "maxHealth": 15,
+            "health": 15,
+            "maxMana": 0,
+            "mana": 0,
+            "strength": 6,
+            "resistance": 3,
+            "magicalMight": 0,
+            "magicalMending": 0,
+            "agility": 2,
+            "deftness": 3
+          }
+        }
+      ],
+      "coords": {
+        "x": 0,
+        "y": 0
+      },
+      "name": "y",
+      "gold": 0
+    }
+  },
+  {
+    "name": "Zo",
+    "user": {
+      "characters": [
+        {
+          "name": "Zo",
+          "level": 1,
+          "experiences": 0,
+          "requiredExperiences": 0,
+          "defending": false,
+          "dodgeChancePerAgility": 0.05,
+          "criticalChancePerDeftness": 0.075,
+          "className": "warrior",
+          "stats": {
+            "maxHealth": 15,
+            "health": 15,
+            "maxMana": 0,
+            "mana": 0,
+            "strength": 6,
+            "resistance": 3,
+            "magicalMight": 0,
+            "magicalMending": 0,
+            "agility": 2,
+            "deftness": 3
+          }
+        }
+      ],
+      "coords": {
+        "x": 0,
+        "y": 0
+      },
+      "name": "Zo",
       "gold": 0
     }
   }

@@ -1,7 +1,7 @@
 {
   "data": [
     {
-      "id": 0,
+      "id": 1,
       "category": "armor",
       "type": "arm",
       "subType": "arm",
@@ -10,7 +10,7 @@
       "defense": 50
     },
     {
-      "id": 1,
+      "id": 2,
       "category": "armor",
       "type": "foot",
       "subType": "boot",
@@ -19,7 +19,7 @@
       "defense": 50
     },
     {
-      "id": 2,
+      "id": 3,
       "category": "armor",
       "type": "head",
       "subType": "helmet",
@@ -28,7 +28,7 @@
       "defense": 50
     },
     {
-      "id": 3,
+      "id": 4,
       "category": "armor",
       "type": "leg",
       "subType": "legware",
@@ -37,7 +37,7 @@
       "defense": 50
     },
     {
-      "id": 4,
+      "id": 5,
       "category": "armor",
       "type": "shield",
       "subType": "lightShield",
@@ -46,7 +46,7 @@
       "defense": 50
     },
     {
-      "id": 5,
+      "id": 6,
       "category": "armor",
       "type": "torso",
       "subType": "chestplate",
@@ -55,7 +55,7 @@
       "defense": 50
     },
     {
-      "id": 6,
+      "id": 7,
       "category": "weapon",
       "type": "sword",
       "subType": "sword",

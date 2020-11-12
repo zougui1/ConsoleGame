@@ -7,12 +7,12 @@
       "health": 4,
       "initMana": 0,
       "mana": 0,
-      "strength": 5,
+      "strength": 6,
       "resistance": 3,
       "magicalMight": 0,
       "magicalMending": 0,
       "agility": 2,
-      "deftness": 2,
+      "deftness": 3,
       "branch": "warrior"
     },
     {
@@ -79,11 +79,11 @@
       "id": "sage",
       "class": "Sage",
       "initHealth": 14,
-      "health": 3,
+      "health": 2,
       "initMana": 11,
-      "mana": 7,
+      "mana": 6,
       "strength": 1,
-      "resistance": 2,
+      "resistance": 1,
       "magicalMight": 7,
       "magicalMending": 7,
       "agility": 2,
@@ -95,9 +95,9 @@
       "class": "Paladin",
       "initHealth": 22,
       "health": 5,
-      "initMana": 4,
+      "initMana": 3,
       "mana": 3,
-      "strength": 5,
+      "strength": 4,
       "resistance": 4,
       "magicalMight": 0,
       "magicalMending": 3,
@@ -113,7 +113,7 @@
       "initMana": 3,
       "mana": 2,
       "strength": 3,
-      "resistance": 3,
+      "resistance": 2,
       "magicalMight": 1,
       "magicalMending": 1,
       "agility": 5,
@@ -129,6 +129,26 @@
       "id": "martialArtist",
       "name": "Martial artist",
       "branch": "monk"
+    },
+    {
+      "id": "merchant",
+      "name": "Merchant",
+      "branch": "merchant"
+    },
+    {
+      "id": "tamer",
+      "name": "Tamer",
+      "branch": "tamer"
+    },
+    {
+      "id": "hunter",
+      "name": "Hunter",
+      "branch": "ranger"
+    },
+    {
+      "id": "skinwalker",
+      "name": "Skinwalker",
+      "branch": "skinwalker"
     }
   ]
 }
