@@ -18,15 +18,16 @@ export class DataManager {
 
   //#region properties
   private _gameDataPath: string = fileSystem.fromProject('game-data');
-  private _savePath: string = this.fromGameData('save.json');
+  private _savesPath: string = this.fromGameData('saves');
   private _buildingsPath: string = this.fromGameData('buildings.json');
   private _equipabilityPath: string = this.fromGameData('equipability.json');
   private _itemsPath: string = this.fromGameData('items.json');
   private _locationsPath: string = this.fromGameData('locations.json');
   private _npcsPath: string = this.fromGameData('npcs.json');
-  private _statsPath: string = this.fromGameData('stats.json');
+  private _classesPath: string = this.fromGameData('classes.json');
   private _mapPath: string = this.fromGameData('map.json');
   private _zonesPath: string = this.fromGameData('zones.json');
+  private _savesExtension: string = '.json';
   //#endregion
 
   //#region functions
@@ -139,9 +140,8 @@ export class DataManager {
   //#endregion
 
   //#region game saving system
-  private getSaves = async (): Promise<LiteralObject[]> => {
-    const savesData = await fileSystem.readFile(this.savePath());
-    return savesData ? JSON.parse(savesData) : [];
+  private getSavePath = (name: string): string => {
+    return path.join(this.savesPath(), name + this.savesExtension());
   }
 
   private cleanSaveProperties = (save: LiteralObject): LiteralObject => {
@@ -171,26 +171,19 @@ export class DataManager {
 
   save = async (game: Game): Promise<void> => {
     const save = this.cleanSaveProperties(game);
-    let saves = await this.getSaves();
-    const saveExists = saves.some(s => s.name === save.name);
-
-    if (saveExists) {
-      saves = saves.map(s => s.name === save.name ? save : s);
-    } else {
-      saves.push(save);
-    }
-
-    await fileSystem.writeFile(this.savePath(), JSON.stringify(saves, null, 2));
+    const savePath = this.getSavePath(game.name());
+    await fileSystem.writeFile(savePath, JSON.stringify(save, null, 2));
   }
 
   getSavesName = async (): Promise<string[]> => {
-    const saves = await this.getSaves();
-    return saves.map(save => save.name);
+    const savesName = await fileSystem.readdir(this.savesPath());
+    return savesName.map(name => name.replace(this.savesExtension(), ''));
   }
 
   load = async (saveName: string) => {
-    const saves = await this.getSaves();
-    return saves.find(save => save.name === saveName);
+    const savePath = this.getSavePath(saveName);
+    const save = await fileSystem.readFile(savePath);
+    return JSON.parse(save);
   }
   //#endregion
 
@@ -267,12 +260,12 @@ export class DataManager {
     return this;
   }
 
-  savePath(): string {
-    return this._savePath;
+  savesPath(): string {
+    return this._savesPath;
   }
 
-  setSavePath(savePath: string): this {
-    this._savePath = savePath;
+  setSavesPath(savesPath: string): this {
+    this._savesPath = savesPath;
     return this;
   }
 
@@ -321,12 +314,12 @@ export class DataManager {
     return this;
   }
 
-  statsPath(): string {
-    return this._statsPath;
+  classesPath(): string {
+    return this._classesPath;
   }
 
-  setStatsPath(statsPath: string): this {
-    this._statsPath = statsPath;
+  setClassesPath(classesPath: string): this {
+    this._classesPath = classesPath;
     return this;
   }
 
@@ -345,6 +338,15 @@ export class DataManager {
 
   setZonesPath(zonesPath: string): this {
     this._zonesPath = zonesPath;
+    return this;
+  }
+
+  savesExtension(): string {
+    return this._savesExtension;
+  }
+
+  setSavesExtension(savesExtension: string): this {
+    this._savesExtension = savesExtension;
     return this;
   }
   //#endregion

@@ -1,7 +1,9 @@
 import { terminal as term } from 'terminal-kit';
 import _ from 'lodash';
 
+import { LayoutSection } from './LayoutSection';
 import { Renderer } from './Renderer';
+import { Overlay } from '../printers';
 import { wait, horizontalBorder, line } from '../utils';
 import { RendererData, IOverlayReturn } from '../types';
 import { PermanentListenening } from '../../console';
@@ -13,10 +15,10 @@ export class Layout {
   //#endregion
 
   //#region properties
-  private _header: Renderer;
-  private _renderers: Renderer[] = [];
-  private _footer: Renderer;
-  private _overlay: Renderer;
+  private _header: LayoutSection;
+  private _contents: LayoutSection[] = [];
+  private _footer: LayoutSection;
+  private _overlay: LayoutSection;
   private _headerHeight: number = 2;
   private _footerHeight: number = 2;
   private _spacingsHeight: number = 1;
@@ -34,6 +36,10 @@ export class Layout {
 
   //#region functions
   private getRenderer = (rendererData: RendererData | Renderer): Renderer => {
+    if (!rendererData) {
+      return null;
+    }
+
     if (rendererData instanceof Renderer) {
       return rendererData;
     }
@@ -43,7 +49,7 @@ export class Layout {
 
   pushContent = (dirtyRenderer: RendererData | Renderer): this => {
     const renderer = this.getRenderer(dirtyRenderer);
-    this.renderers().push(renderer);
+    this.contents().push(new LayoutSection(renderer));
     return this;
   }
 
@@ -61,7 +67,11 @@ export class Layout {
   }
 
   clean = (): this => {
-    this.setHeader(null).setRenderers([]).setFooter(null);
+    this
+      .removeHeader()
+      .removeContent()
+      .removeFooter()
+      .removeOverlay();
     return this;
   }
 
@@ -71,9 +81,35 @@ export class Layout {
     return this;
   }
 
+  erase = (): this => {
+    term.clear();
+    return this;
+  }
+
   bordersHeight = (): number => {
     return this.withBorders() ? 1 : 0
   }
+  //#region remove renderers
+  removeHeader = (): this => {
+    this.setHeader(null);
+    return this;
+  }
+
+  removeContent = (): this => {
+    this.setContents([]);
+    return this;
+  }
+
+  removeFooter = (): this => {
+    this.setFooter(null);
+    return this;
+  }
+
+  removeOverlay = (): this => {
+    this.setOverlay(null);
+    return this;
+  }
+  //#endregion
 
   //#region rendering
   render = async (): Promise<any> => {
@@ -93,9 +129,12 @@ export class Layout {
     this.setIsRendering(false);
 
     if (overlay) {
-      await overlay.onClose;
-      this.overlay().setOption('noRender', true);
-      await this.render();
+      await overlay.onClose();
+      this.removeOverlay();
+    }
+
+    for (const redrawable of this.contents().map(c => c.redrawer())) {
+      await redrawable?.onSelect?.()
     }
   }
 
@@ -107,12 +146,13 @@ export class Layout {
       return;
     }
 
-    header.setOptions({
+    header.renderer().setOptions({
       maxWidth: () => term.width,
       maxHeight: this.headerHeight(),
     }).recreateRenderer();
 
-    await this.renderRenderer(header);
+    term.moveTo(1, 1);
+    await this.renderSection(header);
 
     const headerFullHeight = this.headerHeight() + this.spacingsHeight() - 1;
     term.moveTo(1, headerFullHeight)
@@ -124,16 +164,15 @@ export class Layout {
   }
 
   /**
-   * render `this._renderers`
+   * render `this._contents`
    */
-  renderMain = async (): Promise<any> => {
-    const renderers = this.renderers().filter(r => this.isRenderable(r));
+  renderMain = async (): Promise<void> => {
+    const contents = this.contents().filter(r => this.isRenderable(r));
 
-    const contentYOffset = this.bordersHeight() + this.spacingsHeight();
-    term.moveTo(1, contentYOffset + this.computeElementHeight(this.headerHeight()));
+    term.moveTo(1, this.spacingsHeight() + this.computeElementHeight(this.headerHeight()));
 
-    for (const renderer of renderers) {
-      await this.renderRenderer(renderer);
+    for (const content of contents) {
+      await this.renderSection(content);
     }
   }
 
@@ -145,7 +184,7 @@ export class Layout {
       return;
     }
 
-    footer.setOptions({
+    footer.renderer().setOptions({
       maxWidth: () => term.width,
       maxHeight: this.footerHeight(),
     }).recreateRenderer();
@@ -153,18 +192,18 @@ export class Layout {
     // do not add 1 despite the extra line below
     // it will get some terminals to scroll down by 1
     // to always keep an extra line at the bottom
-    const footerFullHeight = term.height - this.computeElementHeight(this.footerHeight());
-    term.moveTo(1, footerFullHeight);
+    const footerY = term.height - this.computeElementHeight(this.footerHeight());
+    term.moveTo(1, footerY);
 
     if (this.withBorders()) {
       horizontalBorder();
     }
 
     line(this.spacingsHeight())
-    await this.renderRenderer(footer);
+    await this.renderSection(footer);
   }
 
-  renderOverlay = async (): Promise<IOverlayReturn> => {
+  renderOverlay = async (): Promise<Overlay> => {
     const overlay = this.overlay();
     const hasOverlay = this.isRenderable(overlay);
 
@@ -172,27 +211,16 @@ export class Layout {
       return;
     }
 
-    return await this.renderRenderer(overlay);
+    const overlayReturn = await this.renderSection(overlay);
+    return overlayReturn;
   }
 
-  private renderRenderer = async (renderer: Renderer): Promise<any> => {
-    renderer.clean();
-    const renderOptions = renderer.options();
-    const answer = await renderer.render();
-
-    if (renderOptions.renderOnce) {
-      renderer.setOption('noRender', true);
-    }
-
-    if (renderOptions.saveInput) {
-      renderer.setArg({ answer });
-    }
-
-    return answer;
+  private renderSection = async (section: LayoutSection): Promise<any> => {
+    return await section.render();
   }
 
-  private isRenderable = (renderer: Renderer): boolean => {
-    return renderer && !renderer.options().noRender;
+  private isRenderable = (section: LayoutSection): boolean => {
+    return section?.isRenderable();
   }
 
   private computeElementHeight = (height: number): number => {
@@ -208,39 +236,43 @@ export class Layout {
   //#endregion
 
   //#region accessors
-  header(): Renderer {
+  header(): LayoutSection {
     return this._header;
   }
 
   setHeader(header: RendererData | Renderer): this {
-    this._header = this.getRenderer(header);
+    this.header()?.clean();
+    this._header = new LayoutSection(this.getRenderer(header));
     return this;
   }
 
-  renderers(): Renderer[] {
-    return this._renderers;
+  contents(): LayoutSection[] {
+    return this._contents;
   }
 
-  setRenderers(renderers: (RendererData | Renderer)[]): this {
-    this._renderers = renderers.map(renderer => this.getRenderer(renderer));
+  setContents(contents: (RendererData | Renderer)[]): this {
+    this.contents().forEach(content => content.clean());
+    this._contents = contents.map(renderer => new LayoutSection(this.getRenderer(renderer)));
     return this;
   }
 
-  footer(): Renderer {
+  footer(): LayoutSection {
     return this._footer;
   }
 
   setFooter(footer: RendererData | Renderer): this {
-    this._footer = this.getRenderer(footer);
+    this.footer()?.clean();
+    this._footer = new LayoutSection(this.getRenderer(footer));
     return this;
   }
 
-  overlay(): Renderer {
+  overlay(): LayoutSection {
     return this._overlay;
   }
 
-  setOverlay(overlay: RendererData | Renderer): this {
-    this._overlay = this.getRenderer(overlay);
+  setOverlay(overlay: () => Promise<Overlay>): this {
+    this.overlay()?.clean();
+    this._overlay = new LayoutSection(this.getRenderer(overlay));
     return this;
   }
 

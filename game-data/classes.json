@@ -13,7 +13,8 @@
       "magicalMending": 0,
       "agility": 2,
       "deftness": 3,
-      "branch": "warrior"
+      "branch": "warrior",
+      "startUp": true
     },
     {
       "id": "thief",
@@ -28,7 +29,8 @@
       "magicalMending": 1,
       "agility": 3,
       "deftness": 4,
-      "branch": "thief"
+      "branch": "thief",
+      "startUp": true
     },
     {
       "id": "mage",
@@ -43,7 +45,8 @@
       "magicalMending": 2,
       "agility": 2,
       "deftness": 3,
-      "branch": "mage"
+      "branch": "mage",
+      "startUp": true
     },
     {
       "id": "priest",
@@ -58,7 +61,24 @@
       "magicalMending": 4,
       "agility": 3,
       "deftness": 2,
-      "branch": "mage"
+      "branch": "mage",
+      "startUp": true
+    },
+    {
+      "id": "ranger",
+      "class": "Ranger",
+      "initHealth": 13,
+      "health": 3,
+      "initMana": 3,
+      "mana": 2,
+      "strength": 3,
+      "resistance": 2,
+      "magicalMight": 1,
+      "magicalMending": 1,
+      "agility": 5,
+      "deftness": 5,
+      "branch": "archer",
+      "startUp": true
     },
     {
       "id": "gladiator",
@@ -104,21 +124,6 @@
       "agility": 3,
       "deftness": 2,
       "branch": "warrior"
-    },
-    {
-      "id": "ranger",
-      "class": "Ranger",
-      "initHealth": 13,
-      "health": 3,
-      "initMana": 3,
-      "mana": 2,
-      "strength": 3,
-      "resistance": 2,
-      "magicalMight": 1,
-      "magicalMending": 1,
-      "agility": 5,
-      "deftness": 5,
-      "branch": "archer"
     },
     {
       "id": "monk",

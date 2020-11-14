@@ -6,3 +6,5 @@ export * from './string';
 export * from './array';
 export * from './positions';
 export * from './handlers';
+export * from './isAbortable';
+export * from './isRedrawable';

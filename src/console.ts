@@ -1,9 +1,11 @@
 import { terminal as term } from 'terminal-kit';
 
+import { APP_NAME } from './constants';
 import { Func } from './types';
 import { toArray } from './utils';
 
-term.windowTitle('Console Game');
+term.windowTitle(APP_NAME);
+term.hideCursor();
 term.grabInput({
   mouse: 'button',
 });
@@ -17,6 +19,7 @@ export class PermanentListenening {
   //#region properties
   private _id: number = 0;
   private _listeners: IListeners = { key: [], mouse: [], resize: [] };
+  private _locked: boolean = false;
   //#endregion
 
   private constructor() { }
@@ -47,7 +50,12 @@ export class PermanentListenening {
     return this;
   }
 
-  temporaryClearListeners = async (eventName: EventNames | EventNames[], callback: Func): Promise<void> => {
+  temporaryClearListeners = async <T>(eventName: EventNames | EventNames[], callback: (() => Promise<T>)): Promise<T> => {
+    if(this.locked()) {
+      return await callback();
+    }
+
+    this.setLocked(true);
     const eventNames = toArray(eventName);
     const listeners = { key: [], mouse: [], resize: [] };
 
@@ -56,7 +64,7 @@ export class PermanentListenening {
       this.removeListeners(eventName);
     }
 
-    await callback();
+    const callbackReturn = await callback();
 
     for (const eventName of eventNames) {
       term.removeAllListeners(eventName);
@@ -65,6 +73,9 @@ export class PermanentListenening {
         term.on(eventName, listener);
       }
     }
+
+    this.setLocked(false);
+    return callbackReturn;
   }
 
   listen = (): this => {
@@ -105,6 +116,15 @@ export class PermanentListenening {
 
   private setlisteners(listeners: IListeners): this {
     this._listeners = listeners;
+    return this;
+  }
+
+  private locked(): boolean {
+    return this._locked;
+  }
+
+  private setLocked(locked: boolean): this {
+    this._locked = locked;
     return this;
   }
   //#endregion

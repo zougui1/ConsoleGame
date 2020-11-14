@@ -75,5 +75,11 @@ export const frame = async (message: RendererData, options: IFrameOptions = {}):
 
   return {
     closeCoords,
+    start: {
+      x: startX,
+      y: startY,
+    },
+    maxPrintableWidth,
+    maxPrintableHeight,
   };
 }

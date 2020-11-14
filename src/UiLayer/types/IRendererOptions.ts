@@ -7,6 +7,6 @@ export interface IRendererOptions {
   multiline?: boolean;
   maxWidth?: ReturnableValue<number>;
   maxHeight?: ReturnableValue<number>;
-  x?: number;
-  y?: number;
+  x?: ReturnableValue<number>;
+  y?: ReturnableValue<number>;
 }

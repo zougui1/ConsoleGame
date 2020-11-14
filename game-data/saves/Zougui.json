@@ -1,0 +1,35 @@
+{
+  "name": "Zougui",
+  "user": {
+    "characters": [
+      {
+        "name": "Zougui",
+        "level": 1,
+        "experiences": 0,
+        "requiredExperiences": 0,
+        "defending": false,
+        "dodgeChancePerAgility": 0.05,
+        "criticalChancePerDeftness": 0.075,
+        "className": "warrior",
+        "stats": {
+          "maxHealth": 15,
+          "health": 15,
+          "maxMana": 0,
+          "mana": 0,
+          "strength": 6,
+          "resistance": 3,
+          "magicalMight": 0,
+          "magicalMending": 0,
+          "agility": 2,
+          "deftness": 3
+        }
+      }
+    ],
+    "coords": {
+      "x": 0,
+      "y": 0
+    },
+    "name": "Zougui",
+    "gold": 0
+  }
+}

@@ -16,4 +16,7 @@ export interface IFrameOptions {
 
 export interface IFrameReturn {
   closeCoords: IPoint;
+  start: IPoint;
+  maxPrintableWidth: number;
+  maxPrintableHeight: number;
 }

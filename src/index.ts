@@ -1,5 +1,5 @@
 import './formatErrors';
-//import './initGame';
+import './initGame';
 import './process';
 import './console';
 
@@ -8,6 +8,19 @@ import { terminal as term } from 'terminal-kit';
 import { Layout } from './UiLayer/classes';
 import { overlay } from './UiLayer/printers';
 
+/*
+(async () => {
+  const choices = [
+    {
+      message: 'Line 1',
+    },
+    {
+      message: 'Line 2',
+    },
+  ]
+  await select('message', choices)
+})()*/
+/*
 (async () => {
   await Layout
     .get()
@@ -38,3 +51,4 @@ import { overlay } from './UiLayer/printers';
     .setOverlay(() => overlay('My super responsive overlay :o\nwith a really, very, super long content text full of strings', { maxHeight: 15, maxWidth: 50, title: 'Overlay title!' }))
     .render();
 })()
+*/

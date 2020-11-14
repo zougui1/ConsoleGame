@@ -1,5 +1,6 @@
 import { terminal as term } from 'terminal-kit';
 
+//import { SHUTDOWN_SIGNALS } from './constants';
 
 process.on('unhandledRejection', err => {
   if (!err) {
@@ -19,11 +20,7 @@ process.on('uncaughtException', err => {
   process.exit(1);
 });
 
-/*const SHUTDOWN_SIGNALS = [
-  'SIGHUP', 'SIGINT', 'SIGQUIT', 'SIGILL', 'SIGTRAP', 'SIGABRT',
-  'SIGBUS', 'SIGFPE', 'SIGUSR1', 'SIGSEGV', 'SIGUSR2', 'SIGTERM',
-  'beforeExit', 'exit',
-].forEach(sig => {
+/*SHUTDOWN_SIGNALS.forEach(sig => {
   process.on(sig, (...args) => {
     console.log('exit:', sig, 'args:', args);
   })

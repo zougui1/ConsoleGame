@@ -1,7 +1,9 @@
 import { terminal as term } from 'terminal-kit'
 
+import chalk from 'chalk';
 import { symbols } from './symbols';
 
+chalk.gray
 export const styles = {
   prompt: {
     message: '#bbb',
@@ -19,10 +21,10 @@ export const styles = {
   },
 };
 
-
 export const promptStyles = {
   prompt: {
-    selectedStyle: term.italic,
+    style: term.brightCyan,
+    selectedStyle: term.magenta.underline,
     selectedLeftPadding: `${symbols.pointer} `,
     leftPadding: '  ',
     submittedStyle: term,
@@ -31,3 +33,16 @@ export const promptStyles = {
     oneLineItem: true,
   },
 };
+
+/*export const promptStyles = {
+  prompt: {
+    style: term.brightCyan,
+    selectedStyle: term.magenta.underline,
+    selectedLeftPadding: `${symbols.pointer} `,
+    leftPadding: '  ',
+    submittedStyle: term,
+  },
+  select: {
+    oneLineItem: true,
+  },
+};*/

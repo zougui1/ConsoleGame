@@ -17,7 +17,7 @@ export const horizontalBorder = () => {
 
 export const line = (lineCount: number = 1) => {
   if (Number.isSafeInteger(lineCount)) {
-    console.log('\n'.repeat(Math.max(0, lineCount)));
+    term('\n'.repeat(Math.max(0, lineCount)));
   }
 }
 

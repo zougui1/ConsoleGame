@@ -11,6 +11,7 @@ import { User } from './User';
 import { EntityStats } from '../entities';
 import { ConsoleHistory, ConsoleRenderer, Renderer } from '../classes';
 import { DataManager } from '../../DataLayer';
+import { startMenu, loadGameMenu, chooseClassMenu } from '../../UiLayer/views/screens/preGame';
 
 export class Game {
 
@@ -47,51 +48,25 @@ export class Game {
     consolerenderer.add(new Renderer(() => Console.writeLine('Welcome in the Console Game!')));
     await this.consoleHistory().push(consolerenderer).render();
 
-    this.mainMenu();
+    this.startMenu();
   }
 
-  mainMenu = async () => {
-    const result = await this
-      .consoleHistory()
-      .addPromptToRender(({ answer }) => {
-        return Console
-          .line()
-          .select('What do you want to do?', [
-            {
-              message: 'Start a new game',
-              action: this.newGame,
-            },
-            {
-              message: 'Load a game',
-              action: this.loadGame,
-            },
-          ], { answer });
-        })
-      .await<IChoice>();
+  startMenu = async () => {
+    const result = await startMenu({
+      newGame: { func: this.newGame },
+      loadGame: { func: this.loadGame },
+    })
 
     await result.action();
   }
 
   loadGame = async () => {
-    const savesName = await DataManager.get().getSavesName();
-    const choices = savesName.map(saveName => {
-      return {
-        message: saveName,
-        action: this.loader,
-        args: [saveName],
-        call: true,
-        await: true,
-      }
+    const result = await loadGameMenu({
+      origin: { func: this.startMenu },
+      startLoad: { func: this.loader },
     });
 
-    await this
-      .consoleHistory()
-      .addPromptToRender(({ answer }) => {
-        return Console
-          .line()
-          .select('What save do you want to load?', choices, { answer });
-        })
-      .await<IChoice>();
+    await result.action();
   }
 
   private loader = async (saveName: string) => {
@@ -104,17 +79,10 @@ export class Game {
   }
 
   private chooseClass = async () => {
-    const choices: IChoice[] = Object.values(BeginningClasses).map(className => ({
-      message: _.upperFirst(className),
-      action: this.chooseName,
-    }));
-
-    const result = await this
-      .consoleHistory()
-      .addPromptToRender(({ answer }) => {
-        return Console.line().select('What is your class?', choices, { answer });
-      })
-      .await<IChoice>();
+    const result = await chooseClassMenu({
+      origin: { func: this.startMenu },
+      choseClass: { func: this.createGame },
+    });
 
     const character = new Character().setClassName(BeginningClasses[result.message.toLowerCase()]);
     await result.action(character);

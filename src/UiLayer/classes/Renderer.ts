@@ -1,7 +1,7 @@
 import { terminal } from 'terminal-kit';
 import _ from 'lodash';
 
-import { truncate, verticalTruncate, truncateLength, truncateMultiline } from '../utils';
+import { truncate, verticalTruncate, truncateLength, truncateMultiline, getCursorLocation } from '../utils';
 import { IRendererOptions, RendererData, IRendererData } from '../types';
 import { getValue } from '../../utils';
 import { Func } from '../../types';
@@ -13,7 +13,9 @@ export class Renderer {
   private _originalRenderer: Func;
   private _render: Func;
   public promise: Promise<any>;
-  private _options: IRendererOptions = {};
+  private _options: IRendererOptions = {
+    maxWidth: () => terminal.width,
+  };
   private _arg: any = {};truncateLength
   //#endregion
 
@@ -23,6 +25,14 @@ export class Renderer {
     this._originalRenderer = renderer;
     this._render = this.wrapRenderer(renderer);
   }
+
+  //#region static methods
+  static construct(rendererData: RendererData | Renderer): Renderer {
+    return rendererData instanceof Renderer
+      ? rendererData
+      : new Renderer(rendererData);
+  }
+  //#endregion
 
   //#region functions
   private createRenderer = (rendererData: RendererData): Func => {
@@ -69,7 +79,8 @@ export class Renderer {
       const maxHeight = getValue<number>(options.maxHeight);
       const lines = verticalTruncate(fullMessage, maxHeight).split('\n');
       const isMultiline = multiline ?? this.options().multiline;
-      const { x } = options;
+      const x = getValue<number>(options.x);
+      const y = getValue<number>(options.y);
       let linesCount = 0;
 
       if (isMultiline) {
@@ -99,6 +110,12 @@ export class Renderer {
           term(truncatedLines.join('\n'));
         }
       } else {
+        if (x && y) {
+          term.moveTo(x, y);
+        } else if (x) {
+          term.column(x);
+        }
+
         // if the rendering isn't multiline
         // we just need to do a basic truncate
         const truncatedLines = lines.map(line => truncate(line, maxWidth));
@@ -174,7 +191,10 @@ export class Renderer {
   }
 
   setOptions(options: IRendererOptions): this {
-    this._options = options;
+    this._options = {
+      ...this._options,
+      ...options,
+    };
     return this;
   }
 
