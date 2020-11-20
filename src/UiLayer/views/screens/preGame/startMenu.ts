@@ -1,7 +1,7 @@
 import { preGameHeader } from '../../headers';
 import { gameExitConfirmation } from '../../overlays';
 import { Layout } from '../../../classes';
-import { Select } from '../../../printers';
+import { IOnSelectReturn, Select } from '../../../printers';
 import { IChoice } from '../../../types';
 import { EXIT_GAME } from '../../../../constants';
 import { IAction } from '../../../../types';
@@ -34,8 +34,9 @@ export const startMenu = async (actions: IStartMenuActions): Promise<IChoice> =>
     .pushContent(async () => {
       const selectHandler = await new Select(message, choices).init();
 
-      selectHandler.onSelect()
-        .then(result => answer = result.selectedChoice);
+      selectHandler.on('resolve', (result: IOnSelectReturn) => {
+        answer = result.selectedChoice;
+      });
 
       return selectHandler;
     })

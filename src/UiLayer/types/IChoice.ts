@@ -5,4 +5,5 @@ export interface IChoice {
   args?: any[];
   action?: Func;
   name?: string;
+  back?: boolean;
 }

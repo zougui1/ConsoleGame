@@ -28,36 +28,20 @@ export const truncate = (str: string, maxWidth: number, options: ITruncateOption
   return stringCut(str, maxWidth - symbol.length) + symbol;
 }
 
-export const truncateMultiline = (strings: string | string[], maxWidth: number, maxHeight?: number): string[] => {
-  if (maxWidth < 1) {
+export const truncateMultiline = (strings: string | string[], options: ITruncateMultilineOptions): string[] => {
+  const mode = options.mode ?? OverflowMode.letterWrap;
+  const { maxWidth, maxHeight } = options;
+
+  if (maxWidth < 1 || maxHeight < 1) {
+    return [];
+  }
+
+  if (mode === OverflowMode.auto) {
     return toArray(strings);
   }
 
   if (typeof strings === 'string') {
-    const { length } = strings;
-    const lines = [];
-    let start = 0;
-
-    while (start < length) {
-      const end = Math.min(start + maxWidth, length);
-      const substring = strings.substring(start, end);
-      const lastSubChar = substring[substring.length - 1];
-      const firstNexChar = strings[end];
-
-      if (lastSubChar && firstNexChar && lastSubChar !== ' ' && firstNexChar !== ' ') {
-        const actualEnd = substring.lastIndexOf(' ');
-
-        if (actualEnd > 0) {
-          lines.push(stringCut(substring, actualEnd));
-          start += actualEnd;
-        } else {
-          start = end;
-        }
-      } else {
-        lines.push(substring.trimLeft());
-        start = end;
-      }
-    }
+    const lines = wordWrap(strings, maxWidth).split('\n');
 
     const height = Math.min(lines.length, maxHeight);
     const truncatedLines = lines.slice(0, height);
@@ -67,18 +51,43 @@ export const truncateMultiline = (strings: string | string[], maxWidth: number, 
   let lines: string[] = [];
 
   for (const string of strings) {
-    lines = lines.concat(truncateMultiline(string, maxWidth, maxHeight));
+    lines = lines.concat(truncateMultiline(string, {maxWidth, maxHeight, mode}));
   }
 
-  const truncatedLines = truncateLength(lines, maxHeight);
-  return verticalTruncate(truncatedLines, maxHeight, maxWidth, lines).split('\n');
+  return verticalTruncate(lines, maxHeight, maxWidth, lines).split('\n');
+}
+
+const wordWrap = (str, maxWidth) => {
+  let res = '';
+
+  while (str.length > maxWidth) {
+    let found = false;
+    // Inserts new line at first whitespace of the line
+    for (let i = maxWidth - 1; i >= 0; i--) {
+      if (str[i] === ' ') {
+        res += str.slice(0, i) + '\n';
+        str = str.slice(i + 1);
+        found = true;
+        break;
+      }
+    }
+
+    // Inserts new line at maxWidth position, the word is too long to wrap
+    if (!found) {
+      res += str.slice(0, maxWidth + 1) + '\n';
+      str = str.slice(maxWidth + 1);
+    }
+  }
+
+  return res + str;
 }
 
 export const verticalTruncate = (str: string | string[], maxHeight: number, maxWidth: number = 0, originalLines?: string[]): string => {
-  if (maxHeight < 1) {
-    return typeof str === 'string'
+  if (maxHeight < 1 || maxWidth < 1) {
+    return '';
+    /*return typeof str === 'string'
       ? str
-      : str.join('\n');
+      : str.join('\n');*/
   }
 
   const lines = typeof str === 'string'
@@ -88,7 +97,7 @@ export const verticalTruncate = (str: string | string[], maxHeight: number, maxW
   const truncatedLines = truncateLength(lines, maxHeight);
   originalLines ??= lines;
 
-  if (maxWidth < 1 || !truncatedLines.length || truncatedLines.length === originalLines.length) {
+  if (!truncatedLines.length || truncatedLines.length === originalLines.length) {
     return truncatedLines.join('\n');
   }
 
@@ -101,4 +110,10 @@ export const verticalTruncate = (str: string | string[], maxHeight: number, maxW
 export interface ITruncateOptions {
   mode?: OverflowMode;
   symbol?: string;
+}
+
+export interface ITruncateMultilineOptions {
+  maxWidth: number;
+  maxHeight: number;
+  mode?: OverflowMode;
 }

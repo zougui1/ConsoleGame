@@ -1,5 +1,5 @@
 import { Layout } from '../../classes';
-import { handleYesNo } from '../../utils';
+import { handleYesNo } from '../../handlers/handleYesNo';
 import { Overlay } from '../../printers';
 
 export const gameExitConfirmation = (): Promise<boolean> => new Promise((resolve, reject) => {
@@ -34,12 +34,11 @@ export const gameExitConfirmation = (): Promise<boolean> => new Promise((resolve
       const overlayHandler = await new Overlay('[y/n]', overlayOptions).init();
 
       const yesNoHandler = handleYesNo();
-      yesNoHandler.pressedYes
-        .then(answer => {
-          overlayHandler.abort();
+      yesNoHandler
+        .on('finish', answer => {
+          overlayHandler.resolve();
           resolver(answer);
-        })
-        .catch(rejecter);
+        });
 
       overlayHandler.setAbortion(yesNoHandler.abort);
 

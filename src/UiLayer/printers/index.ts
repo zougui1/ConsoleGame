@@ -1,2 +1,3 @@
 export * from './Select';
-export * from './overlay';
+export * from './Overlay';
+export * from './Prompt';

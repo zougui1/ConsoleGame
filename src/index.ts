@@ -1,24 +1,69 @@
 import './formatErrors';
-import './initGame';
+//import './initGame';
 import './process';
 import './console';
 
 import { terminal as term } from 'terminal-kit';
 
-import { Layout } from './UiLayer/classes';
-import { overlay } from './UiLayer/printers';
+import { Layout, Renderer, Element } from './UiLayer/classes';
+import { Overlay, Prompt } from './UiLayer/printers';
+
+(async () => {
+  let count = 0;
+  /*const renderer = new Renderer([
+    {
+      term: term.red,
+      message: ['my ', 'string'],
+      line: true,
+    },
+    {
+      term: term,
+      message: 'Rendered for the ',
+    },
+    {
+      renderer: () => ({
+        term: term.blue,
+        message: (++count).toString(),
+      })
+    },
+    {
+      term: term,
+      message: 'th time',
+    },
+  ]);
+  await renderer.render();
+  renderer.clean().recreateRenderer();
+  console.log()
+  await renderer.render();*/
+
+  const element = new Element(() => [
+    {
+      term: term.red,
+      message: ['my ', 'string'],
+      line: true,
+    },
+    {
+      term: term,
+      message: 'Rendered for the ',
+    },
+    {
+      term: term.blue,
+      message: ++count,
+    },
+    {
+      term: term,
+      message: 'th time',
+    },
+  ]).setMaxHeight(1).setX(5).setY(15);
+  const firstPrint = element.print()
+  element.setY(firstPrint.lineCount + 15).print()
+  //console.log('\n', firstPrint)
+})();
 
 /*
 (async () => {
-  const choices = [
-    {
-      message: 'Line 1',
-    },
-    {
-      message: 'Line 2',
-    },
-  ]
-  await select('message', choices)
+  const prompt = await new Prompt('my message').init();
+  console.log('answer:', await prompt.onResolve());
 })()*/
 /*
 (async () => {

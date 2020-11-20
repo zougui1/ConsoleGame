@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { Console } from '../../libs';
 import { IChoice } from '../../libs/Console/types';
 import { NotImplementedError } from '../../ErrorLayer';
-import { BeginningClasses } from '../enums';
+import { Classes } from '../enums';
 import { Character } from '../entities';
 import { IClassStats } from '../types';
 import { LiteralObject } from '../../types';
@@ -11,7 +11,7 @@ import { User } from './User';
 import { EntityStats } from '../entities';
 import { ConsoleHistory, ConsoleRenderer, Renderer } from '../classes';
 import { DataManager } from '../../DataLayer';
-import { startMenu, loadGameMenu, chooseClassMenu } from '../../UiLayer/views/screens/preGame';
+import * as preGameScreen from '../../UiLayer/views/screens/preGame';
 
 export class Game {
 
@@ -52,7 +52,7 @@ export class Game {
   }
 
   startMenu = async () => {
-    const result = await startMenu({
+    const result = await preGameScreen.startMenu({
       newGame: { func: this.newGame },
       loadGame: { func: this.loadGame },
     })
@@ -61,16 +61,17 @@ export class Game {
   }
 
   loadGame = async () => {
-    const result = await loadGameMenu({
+    const result = await preGameScreen.loadGameMenu({
       origin: { func: this.startMenu },
       startLoad: { func: this.loader },
     });
 
-    await result.action();
+    await result.action(result.message);
   }
 
   private loader = async (saveName: string) => {
     const save = await DataManager.get().load(saveName);
+    console.log(Game.fromJson(save))
     Game.fromJson(save).start();
   }
 
@@ -79,31 +80,33 @@ export class Game {
   }
 
   private chooseClass = async () => {
-    const result = await chooseClassMenu({
+    const result = await preGameScreen.chooseClassMenu({
       origin: { func: this.startMenu },
-      choseClass: { func: this.createGame },
+      choseClass: { func: this.chooseName },
     });
 
-    const character = new Character().setClassName(BeginningClasses[result.message.toLowerCase()]);
+    if (result.back) {
+      return await result.action();
+    }
+
+    const className = Classes[result.message.toLowerCase()];
+
+    const dataManager = DataManager.get();
+    const classStats = await dataManager.getObject(dataManager.classesPath(), className) as IClassStats;
+
+    const character = new Character()
+      .setClassName(className)
+      .setStats(new EntityStats().init(classStats));
     await result.action(character);
   }
 
   private chooseName = async (character: Character) => {
-    const name = await this
-      .consoleHistory()
-      .addPromptToRender(({ answer }) => {
-        return Console.line().prompt('What is your name?', {
-          validate: value => !!value.trim(),
-          answer,
-        });
-      })
-      .await<string>();
-
-    await this.consoleHistory().addToRender(() => {}).await();
-    const dataManager = DataManager.get();
-    const classStats = await dataManager.getObject(dataManager.statsPath(), character.className()) as IClassStats;
-
-    character.setName(name).setStats(new EntityStats().init(classStats));
+    const name = await preGameScreen.chooseUsernamePrompt({
+      header: {
+        className: character.className(),
+      }
+    });
+    character.setName(name);
     this.createGame(character);
   }
 
@@ -119,13 +122,14 @@ export class Game {
   }
 
   private start = async () => {
-    await Console
-      .line(2)
-      .greenBright.write('The game is starting')
-      // TODO uncomment when not in test
-      //.greenBright.dots()
-      .greenBright.dots(0)
-      .await();
+    const user = this.user();
+    const character = user.characters()[0];
+    await preGameScreen.loadingGameScreen({
+      header: {
+        className: character.className(),
+        username: user.name(),
+      }
+    });
 
     this.consoleHistory().newRender();
     this.user().chooseAction();

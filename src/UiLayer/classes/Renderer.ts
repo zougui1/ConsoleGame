@@ -16,7 +16,7 @@ export class Renderer {
   private _options: IRendererOptions = {
     maxWidth: () => terminal.width,
   };
-  private _arg: any = {};truncateLength
+  private _arg: any = {};
   //#endregion
 
   constructor(rendererData: RendererData) {
@@ -48,7 +48,6 @@ export class Renderer {
       });
     }
 
-    //if (Array.isArray(rendererData)) {
     if (Array.isArray(rendererData)) {
       const allRenderers = rendererData.map(rendererData => this.createRenderer(rendererData));
       const maxHeight = getValue<number>(this.options().maxHeight);
@@ -57,6 +56,7 @@ export class Renderer {
       return () => {
         let printedLines = 0;
         renderers.forEach(renderer => printedLines += renderer({ printedLines }) ?? 0);
+        return printedLines;
       };
     }
 
@@ -65,10 +65,13 @@ export class Renderer {
 
   private createRendererFromObject = (rendererData: IRendererData): Func => {
 
+    if(typeof rendererData.renderer === 'function') {
+      return this.createRenderer(rendererData.renderer());
+    }
+
     const fullMessage = typeof rendererData.message === 'string'
       ? rendererData.message
-      : rendererData.message.join('');
-
+      : rendererData.message.join(' '.repeat(rendererData.margin ?? 0));
 
     const { term, line: isLine, multiline } = rendererData;
 
@@ -77,15 +80,15 @@ export class Renderer {
       const options = this.options();
       const maxWidth = getValue<number>(options.maxWidth);
       const maxHeight = getValue<number>(options.maxHeight);
-      const lines = verticalTruncate(fullMessage, maxHeight).split('\n');
+      //const lines = verticalTruncate(fullMessage, maxHeight).split('\n');
+      const lines = fullMessage.split('\n');
       const isMultiline = multiline ?? this.options().multiline;
-      const x = getValue<number>(options.x);
-      const y = getValue<number>(options.y);
+      const x = getValue<number>(rendererData.x ?? options.x);
+      const y = getValue<number>(rendererData.y ?? options.y);
       let linesCount = 0;
 
       if (isMultiline) {
         // if the rendering is multiline we need to do a multiline truncate
-        const maxHeight = getValue<number>(this.options().maxHeight);
         const truncatedLines = truncateMultiline(lines, maxWidth, maxHeight - printedLines);
         linesCount = truncatedLines.length;
 

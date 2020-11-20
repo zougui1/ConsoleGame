@@ -2,7 +2,7 @@
   "data": [
     {
       "id": "warrior",
-      "class": "Warrior",
+      "className": "Warrior",
       "initHealth": 15,
       "health": 4,
       "initMana": 0,
@@ -14,11 +14,11 @@
       "agility": 2,
       "deftness": 3,
       "branch": "warrior",
-      "startUp": true
+      "startup": true
     },
     {
       "id": "thief",
-      "class": "Thief",
+      "className": "Thief",
       "initHealth": 12,
       "health": 3,
       "initMana": 3,
@@ -30,11 +30,11 @@
       "agility": 3,
       "deftness": 4,
       "branch": "thief",
-      "startUp": true
+      "startup": true
     },
     {
       "id": "mage",
-      "class": "Mage",
+      "className": "Mage",
       "initHealth": 11,
       "health": 3,
       "initMana": 7,
@@ -46,11 +46,11 @@
       "agility": 2,
       "deftness": 3,
       "branch": "mage",
-      "startUp": true
+      "startup": true
     },
     {
       "id": "priest",
-      "class": "Priest",
+      "className": "Priest",
       "initHealth": 13,
       "health": 3,
       "initMana": 7,
@@ -62,11 +62,11 @@
       "agility": 3,
       "deftness": 2,
       "branch": "mage",
-      "startUp": true
+      "startup": true
     },
     {
       "id": "ranger",
-      "class": "Ranger",
+      "className": "Ranger",
       "initHealth": 13,
       "health": 3,
       "initMana": 3,
@@ -78,11 +78,11 @@
       "agility": 5,
       "deftness": 5,
       "branch": "archer",
-      "startUp": true
+      "startup": true
     },
     {
       "id": "gladiator",
-      "class": "Gladiator",
+      "className": "Gladiator",
       "initHealth": 18,
       "health": 4,
       "initMana": 0,
@@ -93,11 +93,12 @@
       "magicalMending": 0,
       "agility": 2,
       "deftness": 3,
-      "branch": "warrior"
+      "branch": "warrior",
+      "startup": false
     },
     {
       "id": "sage",
-      "class": "Sage",
+      "className": "Sage",
       "initHealth": 14,
       "health": 2,
       "initMana": 11,
@@ -108,11 +109,12 @@
       "magicalMending": 7,
       "agility": 2,
       "deftness": 2,
-      "branch": "mage"
+      "branch": "mage",
+      "startup": false
     },
     {
       "id": "paladin",
-      "class": "Paladin",
+      "className": "Paladin",
       "initHealth": 22,
       "health": 5,
       "initMana": 3,
@@ -123,37 +125,44 @@
       "magicalMending": 3,
       "agility": 3,
       "deftness": 2,
-      "branch": "warrior"
+      "branch": "warrior",
+      "startup": false
     },
     {
       "id": "monk",
-      "name": "Monk",
-      "branch": "monk"
+      "className": "Monk",
+      "branch": "monk",
+      "startup": false
     },
     {
       "id": "martialArtist",
-      "name": "Martial artist",
-      "branch": "monk"
+      "className": "Martial artist",
+      "branch": "monk",
+      "startup": false
     },
     {
       "id": "merchant",
-      "name": "Merchant",
-      "branch": "merchant"
+      "className": "Merchant",
+      "branch": "merchant",
+      "startup": false
     },
     {
       "id": "tamer",
-      "name": "Tamer",
-      "branch": "tamer"
+      "className": "Tamer",
+      "branch": "tamer",
+      "startup": false
     },
     {
       "id": "hunter",
-      "name": "Hunter",
-      "branch": "ranger"
+      "className": "Hunter",
+      "branch": "ranger",
+      "startup": false
     },
     {
       "id": "skinwalker",
-      "name": "Skinwalker",
-      "branch": "skinwalker"
+      "className": "Skinwalker",
+      "branch": "skinwalker",
+      "startup": false
     }
   ]
 }

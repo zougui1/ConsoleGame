@@ -1,6 +1,6 @@
 import { Renderer } from './Renderer';
 import { isAbortable, isRedrawable } from '../utils';
-import { IAbortable, IRedrawable } from '../types';
+import { IAbortable, IRedrawable, IResolvable } from '../types';
 
 export class LayoutSection {
 
@@ -8,6 +8,7 @@ export class LayoutSection {
   private _renderer: Renderer;
   private _redrawer: IRedrawable;
   private _aborter: IAbortable;
+  private _resolver: IResolvable;
   //#endregion
 
   constructor(renderer: Renderer) {
@@ -37,9 +38,16 @@ export class LayoutSection {
 
     if (this.isAbortable(answer)) {
       this.setAborter(answer);
-    } else if (this.isRedrawabe(answer)) {
+    }
+
+    if (this.isRedrawable(answer)) {
       this.setRedrawer(answer);
     }
+
+    if (this.isResolvable(answer)) {
+      this.setResolver(answer);
+    }
+    this.setResolver(answer)
 
     return answer;
   }
@@ -60,12 +68,16 @@ export class LayoutSection {
     return renderer && !renderer.options().noRender;
   }
 
-  private isRedrawabe = (val: any): boolean => {
+  private isRedrawable = (val: any): boolean => {
     return isRedrawable(val);
   }
 
   private isAbortable = (val: any): boolean => {
-    return isAbortable(val) && !this.isRedrawabe(val);
+    return isAbortable(val) && !this.isRedrawable(val);
+  }
+
+  private isResolvable = (val: any): boolean => {
+    return typeof val?.onResolve === 'function';
   }
   //#endregion
 
@@ -94,6 +106,15 @@ export class LayoutSection {
 
   setAborter(aborter: IAbortable): this {
     this._aborter = aborter;
+    return this;
+  }
+
+  resolver(): IResolvable {
+    return this._resolver;
+  }
+
+  setResolver(resolver: IResolvable): this {
+    this._resolver = resolver;
     return this;
   }
   //#endregion

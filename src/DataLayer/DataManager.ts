@@ -182,7 +182,7 @@ export class DataManager {
 
   load = async (saveName: string) => {
     const savePath = this.getSavePath(saveName);
-    const save = await fileSystem.readFile(savePath);
+    const save = await this.getFile(savePath);
     return JSON.parse(save);
   }
   //#endregion

@@ -1,8 +1,9 @@
+import { Game } from './Game';
 import { Character, Monster, Entity } from '../entities';
 import { DataManager } from '../../DataLayer';
 import { Console } from '../../libs';
 import { wait } from '../../libs/Console/utils';
-import { Game } from './Game';
+import * as battleScreen from '../../UiLayer/views/screens/battle';
 
 export class Battle {
 
@@ -13,24 +14,47 @@ export class Battle {
 
   //#region functions
   battle = async () => {
+    const data: battleScreen.IBattleScreenData = {
+      header: {
+        characters: this.characters(),
+      },
+      content: {
+        monsters: this.enemies(),
+      },
+    };
+
+    // TODO menu
+    await battleScreen.enterBattleScreen(data);
+    await this.fight();
+  }
+
+  fight = async () => {
     const entities = [...this.characters(), ...this.enemies()].sort((a, b) => b.stats().agility() - a.stats().agility());
     let i = 0;
 
     while (this.isTeamAlive() && this.isEnemyAlive() && i < 20) {
-      Game.get().consoleHistory().newRender();
+      //Game.get().consoleHistory().newRender();
 
       for (const entity of entities) {
         if (entity.isAlive()) {
-          await Game.get().consoleHistory().addToRender(() => {
+          /*await Game.get().consoleHistory().addToRender(() => {
             return Console.writeLine('action for:', entity.name()).await()
-          });
-          await entity.chooseAction();
+          });*/
+          //await entity.chooseAction();
         }
 
         await wait(1000)
       }
       i++;
     }
+  }
+
+  tryFlee = async () => {
+
+  }
+
+  flee = async () => {
+
   }
 
   isTeamAlive = (): boolean => {

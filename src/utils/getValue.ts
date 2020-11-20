@@ -1,5 +1,5 @@
-export const getValue = <T>(value: any | ((...args: any[]) => T)): T => {
+export const getValue = <T>(value: any | ((...args: any[]) => T), ...args: any[]): T => {
   return typeof value === 'function'
-    ? value()
+    ? value(...args)
     : value;
 }

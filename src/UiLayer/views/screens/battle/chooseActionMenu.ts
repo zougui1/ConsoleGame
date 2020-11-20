@@ -5,7 +5,7 @@ import { IChoice } from '../../../types';
 import { IAction } from '../../../../types';
 import { DataManager } from '../../../../DataLayer';
 
-export const loadGameMenu = async (actions: ILoadGameMenuActions): Promise<IChoice> => {
+export const chooseActionMenu = async (actions: ILoadGameMenuActions): Promise<IChoice> => {
   const message = 'Which save do you want to load?';
   const savesName = await DataManager.get().getSavesName();
   const choices: IChoice[] = savesName.map(saveName => {

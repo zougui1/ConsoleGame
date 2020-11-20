@@ -5,7 +5,7 @@ import { LayoutSection } from './LayoutSection';
 import { Renderer } from './Renderer';
 import { Overlay } from '../printers';
 import { wait, horizontalBorder, line } from '../utils';
-import { RendererData, IOverlayReturn } from '../types';
+import { RendererData } from '../types';
 import { PermanentListenening } from '../../console';
 
 export class Layout {
@@ -21,7 +21,7 @@ export class Layout {
   private _overlay: LayoutSection;
   private _headerHeight: number = 2;
   private _footerHeight: number = 2;
-  private _spacingsHeight: number = 1;
+  private _spacingsHeight: number = 0;
   private _withBorders: boolean = true;
   private _isRendering = false;
   //#endregion
@@ -112,7 +112,7 @@ export class Layout {
   //#endregion
 
   //#region rendering
-  render = async (): Promise<any> => {
+  render = async (): Promise<this> => {
     this.setIsRendering(true);
     term.clear();
 
@@ -129,13 +129,15 @@ export class Layout {
     this.setIsRendering(false);
 
     if (overlay) {
-      await overlay.onClose();
+      await overlay.waitForFinish();
       this.removeOverlay();
     }
 
-    for (const redrawable of this.contents().map(c => c.redrawer())) {
-      await redrawable?.onSelect?.()
+    for (const onResolve of this.contents().map(c => c.resolver()?.waitForResolve)) {
+      await onResolve?.()
     }
+
+    return this;
   }
 
   renderHeader = async (): Promise<any> => {
@@ -154,11 +156,9 @@ export class Layout {
     term.moveTo(1, 1);
     await this.renderSection(header);
 
-    const headerFullHeight = this.headerHeight() + this.spacingsHeight() - 1;
-    term.moveTo(1, headerFullHeight)
-    line(this.spacingsHeight());
-
     if (this.withBorders()) {
+      const headerFullHeight = this.computeElementHeight(this.headerHeight());
+      term.moveTo(1, headerFullHeight);
       horizontalBorder();
     }
   }
@@ -169,7 +169,12 @@ export class Layout {
   renderMain = async (): Promise<void> => {
     const contents = this.contents().filter(r => this.isRenderable(r));
 
-    term.moveTo(1, this.spacingsHeight() + this.computeElementHeight(this.headerHeight()));
+    const headerFullHeight = this.computeElementHeight(this.headerHeight());
+    // we add 1 so it doesn't get written over the border
+    // we add the spacing height so we have a spacing between the border and the content
+    const spacingHeight = Math.max(1, this.spacingsHeight());
+    const contentStartY = headerFullHeight + 1 + spacingHeight;
+    term.moveTo(1, contentStartY);
 
     for (const content of contents) {
       await this.renderSection(content);

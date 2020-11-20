@@ -1,3 +1,5 @@
+import { terminal as term } from 'terminal-kit';
+
 import { Location, Building } from '.';
 import { Battle } from './Battle';
 import { Console } from '../../libs';
@@ -11,6 +13,7 @@ import { LiteralObject } from '../../types';
 import { DataManager } from '../../DataLayer';
 import { wildernessHeader } from './headers';
 import { Zone } from '../misc';
+import * as wildernessScreen from '../../UiLayer/views/screens/wilderness';
 
 export class User {
 
@@ -49,13 +52,21 @@ export class User {
       } else if (this.location()) {
         UserMenus.locationMenu(this);
       } else {
-        Game
-          .get()
-          .consoleHistory()
-          .addHeader(() => {
-            return wildernessHeader(this.coords()).await();
-          });
-        UserMenus.wildernessMenu(this);
+        const coords = this.coords();
+        const actions: wildernessScreen.IWildernessStandByMenuActions = {
+          move: { func: this.chooseDirection },
+          //inventory: { func: this.inventory },
+          inventory: { func: () => { } },
+        };
+        const data: wildernessScreen.IWildernessScreenData = {
+          header: {
+            coords: this.coords(),
+          },
+        };
+
+        const answer = await wildernessScreen.wildernessStandByMenu(actions, data);
+
+        await answer.action();
       }
     } else {
       throw new NotImplementedError();
@@ -63,23 +74,22 @@ export class User {
   }
 
   chooseDirection = async () => {
-    const game = Game.get();
+    const data: wildernessScreen.IWildernessScreenData = {
+      header: {
+        coords: this.coords(),
+      },
+    };
 
-    game
-      .consoleHistory()
-      .newRender()
-      .addHeader(() => {
-        return wildernessHeader(this.coords()).await();
-      })
-      .addToRender(() => Console.writeLine('Press on an arrow to move and on esc to stop moving'));
+    const layout = await wildernessScreen.wildernessMoveScreen(data);
 
-    game.consoleHistory().onCurrent('keypress', (str, key) => {
-      switch (key.name) {
-        case 'up':
-        case 'left':
-        case 'down':
-        case 'right':
-          this.move(Directions[key.name]);
+    term.on('key', async (key: string) => {
+      switch (key) {
+        case 'UP':
+        case 'LEFT':
+        case 'DOWN':
+        case 'RIGHT':
+          await this.move(Directions[key.toLowerCase()]);
+          await layout.render();
           break;
       }
     });
@@ -89,7 +99,7 @@ export class User {
     this.coords().move(direction);
     const x = this.coords().x();
     const y = this.coords().y();
-    await Game.get().consoleHistory().render();
+    //await Game.get().consoleHistory().render();
 
     const potentialLocation = await DataManager.get().findLocationByCoords(x, y);
 

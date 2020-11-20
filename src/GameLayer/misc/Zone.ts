@@ -43,9 +43,10 @@ export class Zone {
   //#region functions
   getSpawnData = (): ISpawnData[] => {
     const percent = randomPercent();
+    const spawnChance = this.spawnChance();
     const spawnsData = [];
 
-    if (this.spawnChance() < percent) {
+    if (spawnChance <= 0 || percent > spawnChance) {
       return spawnsData;
     }
 

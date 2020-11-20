@@ -18,8 +18,10 @@ export class PermanentListenening {
 
   //#region properties
   private _id: number = 0;
-  private _listeners: IListeners = { key: [], mouse: [], resize: [] };
+  private _permanentListeners: IListeners = { key: [], mouse: [], resize: [] };
+  private _tempListeners: IListeners = { key: [], mouse: [], resize: [] };
   private _locked: boolean = false;
+  private _forcedUnlock: boolean = false;
   //#endregion
 
   private constructor() { }
@@ -31,7 +33,7 @@ export class PermanentListenening {
   }
 
   addListener = (eventName: EventNames, handler: Func): this => {
-    this.listeners()[eventName].push({
+    this.permanentListeners()[eventName].push({
       id: this.id(),
       handler,
     });
@@ -43,7 +45,7 @@ export class PermanentListenening {
   removeListeners = (eventName: EventNames): this => {
     term.removeAllListeners(eventName);
 
-    for (const listener of this.listeners()[eventName]) {
+    for (const listener of this.permanentListeners()[eventName]) {
       term.on(eventName, listener.handler);
     }
 
@@ -64,22 +66,22 @@ export class PermanentListenening {
       this.removeListeners(eventName);
     }
 
+    this.setTempListeners(listeners);
     const callbackReturn = await callback();
 
-    for (const eventName of eventNames) {
-      term.removeAllListeners(eventName);
-
-      for (const listener of listeners[eventName]) {
-        term.on(eventName, listener);
-      }
+    if (this.forcedUnlock()) {
+      this.setForcedUnlock(false);
+      return callbackReturn;
     }
 
+    this.restoreTempListeners();
     this.setLocked(false);
+
     return callbackReturn;
   }
 
   listen = (): this => {
-    const listeners = this.listeners();
+    const listeners = this.permanentListeners();
 
     for (const eventName in listeners) {
       for (const listener of listeners[eventName]) {
@@ -90,6 +92,29 @@ export class PermanentListenening {
       }
     }
 
+    return this;
+  }
+
+  private restoreTempListeners = (): this => {
+    const tempListeners = this.tempListeners();
+
+    for (const eventName in tempListeners) {
+      for (const listener of tempListeners[eventName]) {
+        term.on(eventName, listener);
+      }
+    }
+
+    this.setTempListeners({
+      key: [],
+      mouse: [],
+      resize: [],
+    });
+
+    return this;
+  }
+
+  unlock = (): this => {
+    this.setForcedUnlock(true).restoreTempListeners();
     return this;
   }
   //#endregion
@@ -110,12 +135,21 @@ export class PermanentListenening {
     return this;
   }
 
-  private listeners(): IListeners {
-    return this._listeners;
+  private permanentListeners(): IListeners {
+    return this._permanentListeners;
   }
 
-  private setlisteners(listeners: IListeners): this {
-    this._listeners = listeners;
+  private setPermanentListeners(permanentListeners: IListeners): this {
+    this._permanentListeners = permanentListeners;
+    return this;
+  }
+
+  private tempListeners(): IListeners {
+    return this._tempListeners;
+  }
+
+  private setTempListeners(tempListeners: IListeners): this {
+    this._tempListeners = tempListeners;
     return this;
   }
 
@@ -125,6 +159,15 @@ export class PermanentListenening {
 
   private setLocked(locked: boolean): this {
     this._locked = locked;
+    return this;
+  }
+
+  private forcedUnlock(): boolean {
+    return this._forcedUnlock;
+  }
+
+  private setForcedUnlock(forcedUnlock: boolean): this {
+    this._forcedUnlock = forcedUnlock;
     return this;
   }
   //#endregion
