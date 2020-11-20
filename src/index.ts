@@ -54,7 +54,7 @@ import { Overlay, Prompt } from './UiLayer/printers';
       term: term,
       message: 'th time',
     },
-  ]).setMaxHeight(1).setX(5).setY(15);
+  ]).setMaxHeight(2).setX(5).setY(15);
   const firstPrint = element.print()
   element.setY(firstPrint.lineCount + 15).print()
   //console.log('\n', firstPrint)

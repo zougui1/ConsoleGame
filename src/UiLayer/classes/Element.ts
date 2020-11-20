@@ -29,7 +29,7 @@ export class Element {
   private _y: ReturnableValue<number>;
   private _line: boolean;
   private _overflow: OverflowMode;
-  private subElements: Element[] = [];
+  private _subElements: Element[] = [];
   //#endregion
 
   constructor(options: ElementOptions, defaults?: Element) {
@@ -50,7 +50,7 @@ export class Element {
       this.processFunctionOptions(this._functionRender)
     }
 
-    if (this.subElements.length) {
+    if (this.subElements().length) {
       this.moveCursorXY();
       return this.printSubElements();
     }
@@ -134,7 +134,7 @@ export class Element {
     let newLine = true;
     let lastPrint;
 
-    this.subElements.forEach(element => {
+    this.subElements().forEach(element => {
       if (truncated) {
         return;
       }
@@ -252,9 +252,12 @@ export class Element {
   }
 
   private processArrayOptions(elements: string[] | ElementData[]) {
+    const subElements: Element[] = [];
     for (const element of elements) {
-      this.subElements.push(new Element(element, this));
+      subElements.push(new Element(element, this));
     }
+
+    this.setSubElements(subElements);
   }
 
   private setFunctionOptions(options: () => string | string[] | ElementData | ElementData[]) {
@@ -263,7 +266,7 @@ export class Element {
   }
 
   private processFunctionOptions(options: () => string | string[] | ElementData | ElementData[]) {
-    this.subElements = [];
+    this.setSubElements([]);
     this.processStringOptions('');
     this.processOptions(options());
   }
@@ -385,6 +388,15 @@ export class Element {
     }
 
     this._overflow = overflow;
+    return this;
+  }
+
+  subElements(): Element[] {
+    return this._subElements;
+  }
+
+  setSubElements(subElements: Element[]): this {
+    this._subElements = subElements;
     return this;
   }
   //#endregion
